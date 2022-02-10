@@ -15,3 +15,4 @@ The program currently needs 1.14 for:
 - birch sign (because we need 1.14, the sign has to have a woodtype)
 - all the noteblock sounds (there isn't any check present whether they are available)
 - 1.13 is maybe needed for the .schem support (and blockstates) in WorldEdit/etc., idk
+- 1.13 for jungle wood

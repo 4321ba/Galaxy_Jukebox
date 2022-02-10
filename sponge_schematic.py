@@ -43,7 +43,7 @@ class Schematic:
         max_x, max_y, max_z = min_x, min_y, min_z
         #print(max_x, max_y, max_z, min_x, min_y, min_z)#TODO
         for coords in self._blocks:
-            min_x = min(min_x, coords[0])#TODO with if-s
+            min_x = min(min_x, coords[0])#TODO with if-s and separate function maybe
             max_x = max(max_x, coords[0])
             min_y = min(min_y, coords[1])
             max_y = max(max_y, coords[1])

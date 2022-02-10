@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+from vector import Vector
+
 instrument_name = [
     "harp",
     "bass",
@@ -57,7 +59,9 @@ building_material = [
     "gray_concrete", 
 ]
 
-redstone = "redstone_wire[east=side,north=side,south=side,west=side]"
+even_delay_buildblock = "polished_andesite"
+odd_delay_buildblock = "polished_granite"
+start_line_buildblock = "polished_diorite"
 
 def cardinal_direction(v):
     assert v.y==0 and ((abs(v.x)==1 and v.z==0) or (v.x==0 and abs(v.z)==1))
@@ -70,48 +74,92 @@ def cardinal_direction(v):
     if v.z == -1:
         return "north"
 
-# note that repeater is facing the opposite direction than it would make sense, hence the minus sign
-def repeater(forward, delay):
-    assert delay in [1, 2, 3, 4]
-    return f"repeater[delay={delay},facing={cardinal_direction(-forward)}]"
 
-#def observer(forward):TODO
-#    return f"observer[facing={cardinal_direction(-forward)}]"
-"""
-def create_beginning(schem, buildblock, v, forward, note, instrument, is_even):
-    if instrument_name[instrument] == "snare": # all snare blocks are affected by gravity, we need a block below
-        schem.setblock(v.x, v.y-1, v.z, "tripwire")#may be out of bounds!TODO
-    schem.setblock(v.x, v.y+0, v.z, instrument_material[instrument])
-    schem.setblock(v.x, v.y+1, v.z, f"note_block[note={note},instrument={instrument_name[instrument]}]")
-    v += forward
+# these 3 functions are used throughout split_lines and here in delay, exclusively, to create blocks:
+
+def setblock(schem, v, block):
+    schem.setblock(v.x, v.y, v.z, block)
+
+def block_and_redstone(schem, v, buildblock, powered=False):
     schem.setblock(v.x, v.y+0, v.z, buildblock)
-    schem.setblock(v.x, v.y+1, v.z, "repeater[facing=south]")
-    v += forward
-    schem.setblock(v.x, v.y+1, v.z, buildblock)
-    schem.setblock(v.x, v.y+2, v.z, "cobblestone" if is_even else "dirt")
-    schem.setblock(v.x, v.y+3, v.z, redstone)
-    v += forward
-"""
+    schem.setblock(v.x, v.y+1, v.z, f"redstone_wire[east=side,north=side,power={15 if powered else 0},south=side,west=side]")
+    
+def block_and_repeater(schem, v, buildblock, facing_direction, delay=1, locked=False, powered=False):
+    assert delay in [1, 2, 3, 4]
+    schem.setblock(v.x, v.y+0, v.z, buildblock)
+    schem.setblock(v.x, v.y+1, v.z, f"repeater[delay={delay},facing={cardinal_direction(-facing_direction)},locked={locked},powered={powered}]")
 
 
-from vector import Vector
-class DummySchematic:
-    def setblock(self, x, y, z, block):
-        pass
+# return the space/blocks needed for the delay and md pair
 def get_delay_length(delay, md):
+    
+    class DummySchematic:
+        def setblock(self, x, y, z, block):
+            pass
+    
     schem = DummySchematic()
     v = Vector(0, 0, 0)
     forward = Vector(0, 0, 1)
-    create_delay(schem, "stone", v, forward, delay, md)
+    build_delay(schem, "", v, forward, delay, md)
     return v.z
 
-def create_delay(schem, buildblock, v, forward, delay, md, loopback=True):
+"""
+creates the delay in the form:
+
+<> : repeater
+-  : redstone
+≤≥ : repeater or redstone
+█  : block
+?  : something
+
+from the side:
+>>>>>>█
+██████-
+≤????<█
+█????█ 
+
+the signal goes in on the top, and after delay time, it comes back at the bottom
+these can be stacked one after another, creating the heart of the whole contraption
+
+if loopback is false, the redstone at the end won't get placed, making it useful for turning sideway
+v is modified to represent the actual position!
+"""
+def build_delay(schem, buildblock, v, forward, delay, md, loopback=True):
     
-    # md: minimum of the delays afterwards, determines how much delay we can put to the repeaters
-    # we can't put 2 repeaters after one another on the bottom line with small md because of this bug:
+    
+    # helper functions for e.g.: placing a redstone down and a repeater up
+    # these additionally move v forward, as it is always needed after placing these
+
+    def d_redstone_u_repeater(schem, buildblock, v, forward, u_delay):
+        block_and_redstone(schem, v, buildblock)
+        block_and_repeater(schem, v + Vector(0, 2, 0), buildblock, forward, delay=u_delay)
+        v += forward
+
+    def d_repeater_u_repeater(schem, buildblock, v, forward, d_delay, u_delay):
+        block_and_repeater(schem, v, buildblock, -forward, delay=d_delay)
+        block_and_repeater(schem, v + Vector(0, 2, 0), buildblock, forward, delay=u_delay)
+        v += forward
+
+    def d_block_u_repeater(schem, buildblock, v, forward, u_delay):
+        setblock(schem, v + Vector(0, 1, 0), buildblock)
+        block_and_repeater(schem, v + Vector(0, 2, 0), buildblock, forward, delay=u_delay)
+        v += forward
+
+    def d_loopback_u_block(schem, buildblock, v, forward, loopback):
+        if loopback:
+            block_and_redstone(schem, v + Vector(0, 1, 0), buildblock)
+        else:
+            setblock(schem, v + Vector(0, 1, 0), buildblock)
+        setblock(schem, v + Vector(0, 3, 0), buildblock)
+        v += forward
+
+
+    # md: minimum of the delays in the entire line afterwards, determines how much delay we can put onto the repeaters
+    # we can't put 2 repeaters after one another on the bottom line with md=2 because of this bug:
     # https://bugs.mojang.com/browse/MC-54711
+    # because of this, with even md, we can't end with a repeater with delay=md//2 on the bottom 
     # also related is that with md6 e.g.:
-    # a 3 tick repeater can only go after a 1 tick one, if the pulse is already 3 tick long, it doesn't work if it's shorter
+    # a 3 tick repeater can only go after a 1 tick one if the pulse is already 3 tick long, it doesn't work if the pulse is shorter
 
     # 1 tick repeaters everywhere, repeater chaining only at the top
     def create_delay_md2(schem, buildblock, v, forward, delay, loopback):
@@ -251,35 +299,6 @@ def create_delay(schem, buildblock, v, forward, delay, md, loopback=True):
         8: create_delay_md8,
         9: create_delay_md9_or_above
     }
+    
+    # actually executing the needed thing:
     delay_functions[min(md, 9)](schem, buildblock, v, forward, delay, loopback)
-
-
-# helper functions for e.g.: placing a redstone down and a repeater up
-# these additionally move v forward, as it is always needed after placing these
-
-def d_redstone_u_repeater(schem, buildblock, v, forward, u_delay):
-    schem.setblock(v.x, v.y+0, v.z, buildblock)
-    schem.setblock(v.x, v.y+1, v.z, redstone)
-    schem.setblock(v.x, v.y+2, v.z, buildblock)
-    schem.setblock(v.x, v.y+3, v.z, repeater(forward, u_delay))
-    v += forward
-
-def d_repeater_u_repeater(schem, buildblock, v, forward, d_delay, u_delay):
-    schem.setblock(v.x, v.y+0, v.z, buildblock)
-    schem.setblock(v.x, v.y+1, v.z, repeater(-forward, d_delay))
-    schem.setblock(v.x, v.y+2, v.z, buildblock)
-    schem.setblock(v.x, v.y+3, v.z, repeater(forward, u_delay))
-    v += forward
-
-def d_block_u_repeater(schem, buildblock, v, forward, u_delay):
-    schem.setblock(v.x, v.y+1, v.z, buildblock)
-    schem.setblock(v.x, v.y+2, v.z, buildblock)
-    schem.setblock(v.x, v.y+3, v.z, repeater(forward, u_delay))
-    v += forward
-
-def d_loopback_u_block(schem, buildblock, v, forward, loopback):
-    schem.setblock(v.x, v.y+1, v.z, buildblock)
-    if loopback:
-        schem.setblock(v.x, v.y+2, v.z, redstone)
-    schem.setblock(v.x, v.y+3, v.z, buildblock)
-    v += forward
