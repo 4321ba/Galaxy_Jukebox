@@ -310,32 +310,10 @@ class SplitLine:
                     turns.pop(0)
 
 # mind <= 9
-def bisect_delay_halving_point(remaining_blocks, delay, mind):
-    res1 = bdhp1(remaining_blocks, delay, mind)
-    res2 = bdhp2(remaining_blocks, delay, mind)
-    assert res1 == res2, f"{res1}, {res2} arent the same! mind:{mind} and delay:{delay}, remblocks:{remaining_blocks}"
-    return res2
-    
-def bdhp1(remaining_blocks, delay, mind):
-    # we split the delay in half, delay+leftout_delay will remain constant
-    # while delay is good AND (we need less of delay OR there's too little leftout_delay)
-    # this could be much improved with a binary search e.g. TODO
-    print("searching for bis1111111111111111111111111111ct")
-    delay_before_turn = delay
-    delay_after_turn = 0
-    while delay_before_turn >= mind and (bld.get_delay_length(delay_before_turn, mind) > remaining_blocks or delay_after_turn < mind):
-        delay_before_turn -= 1
-        delay_after_turn += 1
-    print(delay_before_turn)
-    return delay_before_turn
-
 # with binary search!
-def bdhp2(remaining_blocks, delay, mind):
-    print("searching for bis2222222222222222222222222222ct")
-    delay_before_turn = delay
-    delay_after_turn = 0
-    
-    #if (bld.get_delay_length(delay_before_turn, mind) > remaining_blocks or delay_after_turn < mind) and (delay_before_turn == mind or (delay_before_turn >= mind and bld.get_delay_length(delay_before_turn-1, mind) <= remaining_blocks and delay_after_turn+1 >= mind) ):
+# for the history of this function, see:
+# https://github.com/4321ba/Galaxy_Jukebox/blob/fb43d9307477052ae2116b9a90e35f7e8167b977/split_lines.py#L312-L359
+def bisect_delay_halving_point(remaining_blocks, delay, mind):
     # remotely based on: https://www.javatpoint.com/binary-search-in-python
     low = mind
     high = delay - mind
@@ -343,20 +321,17 @@ def bdhp2(remaining_blocks, delay, mind):
         mid = (low + high) // 2
         delay_before_turn = mid
         delay_after_turn = delay - delay_before_turn
-        # check_1 = delay_before_turn+1 >= mind and (bld.get_delay_length(delay_before_turn+1, mind) > remaining_blocks or delay_after_turn-1 < mind)
-        # check_2 = delay_before_turn >= mind and (bld.get_delay_length(delay_before_turn, mind) > remaining_blocks or delay_after_turn < mind)
-        check_1 = bld.get_delay_length(delay_before_turn+1, mind) > remaining_blocks or delay_after_turn-1 < mind
-        check_2 = bld.get_delay_length(delay_before_turn, mind) > remaining_blocks
-        if check_1 and check_2:
+        almost_too_long = bld.get_delay_length(delay_before_turn + 1, mind) > remaining_blocks or delay_after_turn == mind
+        too_long = bld.get_delay_length(delay_before_turn, mind) > remaining_blocks
+        if almost_too_long and too_long:
             high = mid - 1
-        elif not check_1 and not check_2:
+        elif not almost_too_long and not too_long:
             low = mid + 1
-        elif check_1 and not check_2:
+        elif almost_too_long and not too_long:
             return delay_before_turn
-        else:# not check_1 and check_2
-            assert False, "Impossible! 1"
-    return -1#TODO
-    assert False, "Impossible 2!"
+        else: # not almost_too_long and too_long
+            assert False, "Impossible! almost_too_long is false while too_long is true, this would mean that a bigger delay takes less blocks than a smaller one or something like that."
+    assert False, "Impossible! No delay halving point found, this function is only meant to be called if there is a solution."
 
 
 # begin_v is the coordinate of the even (andesite) connector of the very first (upper left) noteblock line
@@ -587,8 +562,8 @@ def build_contraption(schem, lines, left_width, middle_width, right_width, heigh
         # finding out where each line needs to turn:
         turns = []
         # 2 because it is needed before the first turn
-        z_difference = current_z - begin_z + 3 + additional_spacing# TODO 2
-        turns.append(3 + 2 * line.col)# TODO 2
+        z_difference = current_z - begin_z + 2 + additional_spacing
+        turns.append(2 + 2 * line.col)
         # these values are because of the horizontal adjustment, and to make space for the vertical connection and 1gt delay maker
         x_difference = 2 * width + 13
         turns.append(9 + 4 * line.col)
