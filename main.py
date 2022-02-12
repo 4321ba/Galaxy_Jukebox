@@ -9,7 +9,7 @@ from sponge_schematic import Schematic
 """
 song is either pynbs.File or string (= input path)
 sides_mode is how many sides the noteblocks should have (-1, or between 1 and 3)
--1: using the best
+-1: using one of the 3 based on noteblock count
 1: 2n wide, n high rectangle in front
 2: 2n×n rectangle to the right and another in front
 3: 2n×n rectangles on all 3 sides
@@ -29,22 +29,33 @@ def convert(song, out_path, sides_mode=-1):
     count = len(lines)
     assert count > 0, "There is no line to convert!"
     if sides_mode == -1:
-        if count <= 128:
+        if count <= 128: # 16*8
             sides_mode = 1
-        elif count <= 256:
+        elif count <= 256: # 2 * 16*8
             sides_mode = 2
         else:
             sides_mode = 3
+    
+    # imagining every side as a 2:1 rectangle, but we need to round to whole numbers:
     height = int(0.5 + ceil(sqrt( count / (2 * sides_mode) )))
+    whole_width = int(0.5 + ceil(count / height))
     
     schem = Schematic()
     
     if sides_mode == 1:
-        build_contraption(schem, lines, 0, (count - 1) // height + 1, 0, height)
+        left_width = 0
+        middle_width = whole_width
+        right_width = 0
     elif sides_mode == 2:
-        build_contraption(schem, lines, height * 2, height * 2, 0, height)
+        left_width = whole_width // 2
+        middle_width = whole_width - left_width
+        right_width = 0
     else:
-        build_contraption(schem, lines, height * 2, height * 2, height * 2, height) # TODO maybe even out the missing lines so its not that abrupt
+        left_width = whole_width // 3
+        middle_width = whole_width - 2 * left_width
+        right_width = left_width
+    
+    build_contraption(schem, lines, left_width, middle_width, right_width, height)
     
     schem.save(out_path)
 
@@ -58,3 +69,4 @@ if __name__ == '__main__':
 #TODO render distance recommendation sign
 # maybe fix the corners of the noteblock sides
 # maybe some more explanation for methods
+# TODO thank lithium+sodium dev

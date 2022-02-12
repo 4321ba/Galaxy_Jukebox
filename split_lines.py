@@ -236,7 +236,7 @@ class SplitLine:
                 if not turns or placed_blocks + next_length + 1 < turns[0]:
                     bld.build_delay(self._schem, self._buildblock, v, self._forward, delay, md)
                     placed_blocks += next_length
-                # if there are turns and there isn't enough space to just place the delay
+                # if there isn't enough space to just place the delay, and we have to turn somewhere
                 else:
                     # if we strech it out one more block, it will fit perfectly
                     if placed_blocks + next_length + 1 == turns[0]:
@@ -251,18 +251,20 @@ class SplitLine:
                     else:
                         run_again = True # we need to keep placing the delay, while staying at the current index of self._delays
                         mind = min(md, 9)
-                        leftout_delay = 0 # we split the delay in half, delay+leftout_delay will remain constant
-                        # while delay is good AND (we need less of delay OR there's too little leftout_delay)
-                        # this could be much improved with a binary search e.g. TODO
+                        
                         #print(f"delay:{delay}, mind:{mind}, turn:{turns[0]}, ")
-                        while delay >= mind and (placed_blocks + bld.get_delay_length(delay, md) > turns[0] or leftout_delay < mind):
-                            delay -= 1
-                            leftout_delay += 1
-                        #print(block_placer.get_delay_length(delay, md), " delay length")
+                        leftout_delay = bisect_delay_halving_point(turns[0] - placed_blocks, delay, mind)
+                        delay -= leftout_delay
+                        #print(bld.get_delay_length(delay, md), " delay length")
+                        
+                        
                         if delay < mind or leftout_delay < mind:
                             spacer = turns[0] - placed_blocks
                             assert spacer <= 13, f"1STCASE delays {delay} or {leftout_delay} aren't big enough with md {mind}, {spacer} is too big to fill in the gap with redstone; placed blocks are {placed_blocks}, and the turn is in {turns[0] - placed_blocks} blocks" # redstone shouldn't run out
-                            assert spacer <= 2, f"I dont think this should be possible"
+                            assert spacer <= 3, f"I dont think this should be possible {spacer}"
+                            if spacer > 2:
+                                print(spacer, v)
+                            #assert spacer <= 2, f"I dont think this should be possible" # TODO IT IS, e.g. md5 delay=9 with 3 blocks left
                             for i in range(spacer):
                                 bld.block_and_redstone(self._schem, v, self._buildblock)
                                 bld.block_and_redstone(self._schem, v + up * 2, self._buildblock)
@@ -293,6 +295,19 @@ class SplitLine:
                     placed_blocks = 0
                     turns.pop(0)
 
+# mind <= 9
+def bisect_delay_halving_point(remaining_blocks, delay, mind):
+    # we split the delay in half, delay+leftout_delay will remain constant
+    # while delay is good AND (we need less of delay OR there's too little leftout_delay)
+    # this could be much improved with a binary search e.g. TODO
+    print("searching for biseeeeeeeeeeeeeeeeeeeeeeeeeect")
+    delay_before_turn = delay
+    delay_after_turn = 0
+    while delay_before_turn >= mind and (bld.get_delay_length(delay_before_turn, mind) > remaining_blocks or delay_after_turn < mind):
+        delay_before_turn -= 1
+        delay_after_turn += 1
+        print(delay_before_turn)
+    return delay_after_turn
 
 
 # begin_v is the coordinate of the even (andesite) connector of the very first (upper left) noteblock line
@@ -456,7 +471,7 @@ def build_glass_walkway(schem, player_pos, forward, one_gt_delayer_pos, length, 
 def build_contraption(schem, lines, left_width, middle_width, right_width, height):
     width = left_width + middle_width + right_width
     assert 1 <= len(lines) <= width * height, f"There are {len(lines)} lines, but only {width * height} places for them!"
-    depth = max(left_width, right_width, middle_width)
+    view_distance = max(left_width, right_width, middle_width) # this is the space between player pos and middle side
     
     def begin_lines(upper_left_corner, prev_width, width, height, forward, lines, index, side):
         line_count = len(lines)
@@ -481,21 +496,22 @@ def build_contraption(schem, lines, left_width, middle_width, right_width, heigh
     # approx. ideal position for listening is the middle of a 2×2×2 cube, which ranges from player_pos to player_pos+v(1,1,1)
     # thus the 2×2 glass below the player is at player_pos+v(0,-1,0) to player_pos+v(1,-1,1)
     player_pos = Vector(0, 0, 0)
-    middle_side_z = player_pos.z + depth
+    middle_side_z = player_pos.z + view_distance
     left_side_x = player_pos.x + middle_width + 1
     right_side_x = player_pos.x - middle_width
     
-    left_nbs_upper_left_corner = Vector(left_side_x, player_pos.y + height, middle_side_z - 2 * left_width + 1)
-    index = begin_lines(left_nbs_upper_left_corner, 0, left_width, height, Vector(0, 0, 1), lines, 0, "left")
-    middle_nbs_upper_left_corner = Vector(left_side_x - 1, player_pos.y + height, middle_side_z)
-    index = begin_lines(middle_nbs_upper_left_corner, left_width, middle_width, height, Vector(-1, 0, 0), lines, index, "middle")
-    right_nbs_upper_left_corner = Vector(right_side_x, player_pos.y + height, middle_side_z)
-    index = begin_lines(right_nbs_upper_left_corner, left_width + middle_width, right_width, height, Vector(0, 0, -1), lines, index, "right")
+    left_side_upper_left_corner = Vector(left_side_x, player_pos.y + height, middle_side_z - 2 * left_width + 1)
+    index = begin_lines(left_side_upper_left_corner, 0, left_width, height, Vector(0, 0, 1), lines, 0, "left")
+    middle_side_upper_left_corner = Vector(left_side_x - 1, player_pos.y + height, middle_side_z)
+    index = begin_lines(middle_side_upper_left_corner, left_width, middle_width, height, Vector(-1, 0, 0), lines, index, "middle")
+    right_side_upper_left_corner = Vector(right_side_x, player_pos.y + height, middle_side_z)
+    index = begin_lines(right_side_upper_left_corner, left_width + middle_width, right_width, height, Vector(0, 0, -1), lines, index, "right")
     assert index == len(lines), f"Something went wrong with beginning the lines, index until built is {index} but the amount of lines is {len(lines)}"
     
-    # the 2*2 * max(left_width, right_width) is the max amount of blocks the signal needs to travel,
+    shallow_depth = max(left_width, right_width)
+    # the 2*2 * shallow_depth is the max amount of blocks the signal needs to travel,
     # but at the 2 ends they may place the repeater 1 block sooner, hence +2
-    turn_max_delay = (2*2 * max(left_width, right_width) + 2) // 16 + 1 # +1 for the extra repeater at the end
+    turn_max_delay = (2*2 * shallow_depth + 2) // 16 + 1 # +1 for the extra repeater at the end
     for line in lines:
         line.build_noteblock(height)
         line.build_side_turn(turn_max_delay)
@@ -504,31 +520,32 @@ def build_contraption(schem, lines, left_width, middle_width, right_width, heigh
     
     bottom_connection_pos = build_vertical_connection(schem, lines[0].get_pos() + Vector(2, 3, 0), height)
     bottom_connection_pos = build_1gt_delayer(schem, bottom_connection_pos, Vector(0, 0, -1))
-    build_glass_walkway(schem, player_pos, Vector(0, 0, -1), bottom_connection_pos, depth, 10)# TODO 10 deep ladder
+    # at least one block, otherwise just enough to go around the left side:
+    walkway_length = max(1, left_width * 2 - view_distance)
+    build_glass_walkway(schem, player_pos, Vector(0, 0, -1), bottom_connection_pos, walkway_length, 10)# TODO 10 deep ladder
     
     # there will be a repeater every 4th block on the horizontal line that gives the signal to the whole thing
     junction_delay = (width - 1) // 2 
     for line in lines:
         line.build_junction(junction_delay)
     
-    # finding out where each line needs to turn:
-    begin_z = player_pos.z - depth
+    # 2, because the start button redstone line needs to have space
+    begin_z = player_pos.z - max(right_width * 2 - view_distance, 2 + walkway_length)
     current_z = lines[0].get_pos().z
-    real_width = lines[-1].col + 1
     # this much spacing will be applied behind the player, >=0, there will be 3 blocks of space with =0 (for the start signal):
     additional_spacing = 8
     for line in lines:
+        # finding out where each line needs to turn:
         turns = []
         # 3 because it is needed before the first turn
-        # 2 because on the other side the start button redstone line needs to have space
-        z_difference = current_z - begin_z + 3 + 2 + additional_spacing
+        z_difference = current_z - begin_z + 3 + additional_spacing
         turns.append(3 + 2 * line.col)
         # these values are because of the horizontal adjustment, and to make space for the vertical connection and 1gt delay maker
-        x_difference = 2 * real_width + 13
+        x_difference = 2 * width + 13
         turns.append(9 + 4 * line.col)
         for i in range(15):#idk, should be long enough TODO
             turns.append(z_difference + 4 * line.col)
-            z_difference += 2 * real_width
+            z_difference += 2 * width
             turns.append(x_difference + 4 * line.col)
-            x_difference += 2 * real_width
+            x_difference += 2 * width
         line.build_delays(turns)

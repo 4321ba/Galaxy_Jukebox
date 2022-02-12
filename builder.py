@@ -75,7 +75,7 @@ def cardinal_direction(v):
         return "north"
 
 
-# these 3 functions are used throughout split_lines and here in delay, exclusively, to create blocks:
+# these 3 functions are used throughout split_lines and here in build_delay, exclusively, to create blocks:
 
 def setblock(schem, v, block):
     schem.setblock(v.x, v.y, v.z, block)

@@ -7,4 +7,4 @@ import nbtlib
 # https://github.com/SpongePowered/Schematic-Specification/blob/master/versions/schematic-2.md
 
 nbt_file = nbtlib.load(sys.argv[1])
-print(nbt_file)
+print(str(nbt_file)[0:1000])
