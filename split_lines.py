@@ -224,6 +224,7 @@ class SplitLine:
         up = Vector(0, 1, 0)
         placed_blocks = 0 # blocks placed since the previous turn
         for delay_index, delay in enumerate(self._delays):
+            # md = minimum delay, needed for how much delay can be put onto repeaters, and for more too
             md = min(self._delays[delay_index:]) # could be optimized: only recalculate this if previous delay==md
             
             run_again = True
@@ -236,7 +237,7 @@ class SplitLine:
                 if not turns or placed_blocks + next_length + 1 < turns[0]:
                     bld.build_delay(self._schem, self._buildblock, v, self._forward, delay, md)
                     placed_blocks += next_length
-                # if there isn't enough space to just place the delay, and we have to turn somewhere
+                # if there isn't enough space to just place the delay and move on, and we have to turn somewhere
                 else:
                     # if we strech it out one more block, it will fit perfectly
                     if placed_blocks + next_length + 1 == turns[0]:
@@ -251,43 +252,56 @@ class SplitLine:
                     else:
                         run_again = True # we need to keep placing the delay, while staying at the current index of self._delays
                         mind = min(md, 9)
-                        
-                        #print(f"delay:{delay}, mind:{mind}, turn:{turns[0]}, ")
-                        leftout_delay = bisect_delay_halving_point(turns[0] - placed_blocks, delay, mind)
-                        delay -= leftout_delay
-                        #print(bld.get_delay_length(delay, md), " delay length")
-                        
-                        
-                        if delay < mind or leftout_delay < mind:
-                            spacer = turns[0] - placed_blocks
-                            assert spacer <= 13, f"1STCASE delays {delay} or {leftout_delay} aren't big enough with md {mind}, {spacer} is too big to fill in the gap with redstone; placed blocks are {placed_blocks}, and the turn is in {turns[0] - placed_blocks} blocks" # redstone shouldn't run out
-                            assert spacer <= 3, f"I dont think this should be possible {spacer}"
-                            if spacer > 2:
-                                print(spacer, v)
-                            #assert spacer <= 2, f"I dont think this should be possible" # TODO IT IS, e.g. md5 delay=9 with 3 blocks left
-                            for i in range(spacer):
-                                bld.block_and_redstone(self._schem, v, self._buildblock)
-                                bld.block_and_redstone(self._schem, v + up * 2, self._buildblock)
-                                v += self._forward
-                            delay += leftout_delay
-                        elif placed_blocks + bld.get_delay_length(delay, md) < turns[0]:
-                            placed_blocks += bld.get_delay_length(delay, md) # created later
+                        remaining_blocks = turns[0] - placed_blocks
+                        # if we can't split it into two pieces and have to put redstone as spacer, before the turn
+                        # delay should be at least minimum delay (md) when placing
+                        if delay < 2 * mind or remaining_blocks < bld.get_delay_length(mind, mind):
+                            """
+                            for md in range(2,10): # looping through every possible mind
+                                print(md, bld.get_delay_length(md, md), md*2-1, bld.get_delay_length(md*2-1, md))
+                            out:
+                            2 2  3 3
+                            3 3  5 4
+                            4 2  7 3
+                            5 3  9 4
+                            6 2 11 3
+                            7 3 13 4
+                            8 2 15 3
+                            9 3 17 4
                             
-                            spacer = turns[0] - placed_blocks
-                            assert spacer <= 13, f"2NDCASE delays {delay} or {leftout_delay} aren't big enough with md {mind}, {spacer} is too big to fill in the gap with redstone; placed blocks are {placed_blocks}, and the turn is in {turns[0] - placed_blocks} blocks" # redstone shouldn't run out
-                            if spacer != 1:
-                                bld.build_delay(self._schem, self._buildblock, v, self._forward, delay, md, loopback=False)
-                            for i in range(spacer):
+                            there should be less than 4 remaining blocks, because otherwise it should have been placed
+                            previously, seeing that with every md the biggest delay that can't be split (md*2-1)
+                            fits into the 4 blocks
+                            there should be more than 1 remaining block, because otherwise the previous delay would have been streched out
+                            also the redstone wouldn't be able to connect with the block if it was only 1 block remaining
+                            """
+                            assert remaining_blocks in [2, 3], f"Remaining blocks should be 2 or 3, but it is {remaining_blocks}!"
+                            for i in range(remaining_blocks):
                                 bld.block_and_redstone(self._schem, v, self._buildblock)
                                 bld.block_and_redstone(self._schem, v + up * 2, self._buildblock)
                                 v += self._forward
-                            if spacer == 1:#TODO cleanup, why wont the redstone run out?
-                                bld.build_delay(self._schem, self._buildblock, v, self._forward, delay, md, loopback=False)
-                            delay = leftout_delay
-                        else:#this could be merged with the previous case
-                            assert placed_blocks + bld.get_delay_length(delay, md) == turns[0]
-                            bld.build_delay(self._schem, self._buildblock, v, self._forward, delay, md, loopback=False)
-                            delay = leftout_delay
+                        # now we are sure that we can somehow split the delay into >=2 pieces, but how
+                        else:
+                            delay_before_turn = bisect_delay_halving_point(remaining_blocks, delay, mind)
+                            delay -= delay_before_turn # for next iteration
+                            blocks_for_delay = bld.get_delay_length(delay_before_turn, md)
+                            remaining_blocks -= blocks_for_delay
+                            """
+                            here ideally we find a way to get a perfectly fitting delay before the turn, but it is not guaranteed:
+                            if delay=md fits in before the turn (which it does if we are here),
+                            that means that there exists a delay that fits in perfectly just before the turn
+                            however: if the remaining delay after the turn is less than md, that means we need to give up the perfectness
+                            to save some delay for after the turn, so that it can be placed with md (delay should always be >= md)
+                            dunno if remaining_blocks==3 is actually possible, but remaining_blocks==4 for sure shouldn't be
+                            because every md with delay=md fits into 3 blocks, so if we subtract 3 blocks here,
+                            there should be plenty of delay remaining after the turn for it to be >=md
+                            """
+                            assert remaining_blocks in [0, 1, 2, 3], f"Remaining blocks should be 0, 1, 2 or 3, but it is {remaining_blocks}!"
+                            for i in range(remaining_blocks):
+                                bld.block_and_redstone(self._schem, v, self._buildblock)
+                                bld.block_and_redstone(self._schem, v + up * 2, self._buildblock)
+                                v += self._forward
+                            bld.build_delay(self._schem, self._buildblock, v, self._forward, delay_before_turn, md, loopback=False)
                     # and turning, in case we need to:
                     v -= self._forward
                     self._forward.rotate()
@@ -297,17 +311,52 @@ class SplitLine:
 
 # mind <= 9
 def bisect_delay_halving_point(remaining_blocks, delay, mind):
+    res1 = bdhp1(remaining_blocks, delay, mind)
+    res2 = bdhp2(remaining_blocks, delay, mind)
+    assert res1 == res2, f"{res1}, {res2} arent the same! mind:{mind} and delay:{delay}, remblocks:{remaining_blocks}"
+    return res2
+    
+def bdhp1(remaining_blocks, delay, mind):
     # we split the delay in half, delay+leftout_delay will remain constant
     # while delay is good AND (we need less of delay OR there's too little leftout_delay)
     # this could be much improved with a binary search e.g. TODO
-    print("searching for biseeeeeeeeeeeeeeeeeeeeeeeeeect")
+    print("searching for bis1111111111111111111111111111ct")
     delay_before_turn = delay
     delay_after_turn = 0
     while delay_before_turn >= mind and (bld.get_delay_length(delay_before_turn, mind) > remaining_blocks or delay_after_turn < mind):
         delay_before_turn -= 1
         delay_after_turn += 1
-        print(delay_before_turn)
-    return delay_after_turn
+    print(delay_before_turn)
+    return delay_before_turn
+
+# with binary search!
+def bdhp2(remaining_blocks, delay, mind):
+    print("searching for bis2222222222222222222222222222ct")
+    delay_before_turn = delay
+    delay_after_turn = 0
+    
+    #if (bld.get_delay_length(delay_before_turn, mind) > remaining_blocks or delay_after_turn < mind) and (delay_before_turn == mind or (delay_before_turn >= mind and bld.get_delay_length(delay_before_turn-1, mind) <= remaining_blocks and delay_after_turn+1 >= mind) ):
+    # remotely based on: https://www.javatpoint.com/binary-search-in-python
+    low = mind
+    high = delay - mind
+    while low <= high:
+        mid = (low + high) // 2
+        delay_before_turn = mid
+        delay_after_turn = delay - delay_before_turn
+        # check_1 = delay_before_turn+1 >= mind and (bld.get_delay_length(delay_before_turn+1, mind) > remaining_blocks or delay_after_turn-1 < mind)
+        # check_2 = delay_before_turn >= mind and (bld.get_delay_length(delay_before_turn, mind) > remaining_blocks or delay_after_turn < mind)
+        check_1 = bld.get_delay_length(delay_before_turn+1, mind) > remaining_blocks or delay_after_turn-1 < mind
+        check_2 = bld.get_delay_length(delay_before_turn, mind) > remaining_blocks
+        if check_1 and check_2:
+            high = mid - 1
+        elif not check_1 and not check_2:
+            low = mid + 1
+        elif check_1 and not check_2:
+            return delay_before_turn
+        else:# not check_1 and check_2
+            assert False, "Impossible! 1"
+    return -1#TODO
+    assert False, "Impossible 2!"
 
 
 # begin_v is the coordinate of the even (andesite) connector of the very first (upper left) noteblock line
@@ -537,9 +586,9 @@ def build_contraption(schem, lines, left_width, middle_width, right_width, heigh
     for line in lines:
         # finding out where each line needs to turn:
         turns = []
-        # 3 because it is needed before the first turn
-        z_difference = current_z - begin_z + 3 + additional_spacing
-        turns.append(3 + 2 * line.col)
+        # 2 because it is needed before the first turn
+        z_difference = current_z - begin_z + 3 + additional_spacing# TODO 2
+        turns.append(3 + 2 * line.col)# TODO 2
         # these values are because of the horizontal adjustment, and to make space for the vertical connection and 1gt delay maker
         x_difference = 2 * width + 13
         turns.append(9 + 4 * line.col)
