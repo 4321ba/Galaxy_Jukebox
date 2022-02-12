@@ -17,7 +17,7 @@ class Vector:
         return Vector(self.x - other.x, self.y - other.y, self.z - other.z)
     
     def __mul__(self, other):
-        assert type(other) == int
+        assert type(other) == int, "Only vector*integer is implemented!"
         return Vector(self.x * other, self.y * other, self.z * other)
     
     def __iadd__(self, other):

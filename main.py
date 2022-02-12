@@ -64,9 +64,9 @@ if __name__ == '__main__':
     from sys import argv
     convert(argv[1], argv[2])
 
-#TODO all asserts should have explanation
 #TODO: custom instruments
 #TODO render distance recommendation sign
+# TODO nbt data to schematic + sign text
 # maybe fix the corners of the noteblock sides
 # maybe some more explanation for methods
 # TODO thank lithium+sodium dev

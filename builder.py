@@ -85,7 +85,7 @@ def block_and_redstone(schem, v, buildblock, powered=False):
     schem.setblock(v.x, v.y+1, v.z, f"redstone_wire[east=side,north=side,power={15 if powered else 0},south=side,west=side]")
     
 def block_and_repeater(schem, v, buildblock, facing_direction, delay=1, locked=False, powered=False):
-    assert delay in [1, 2, 3, 4]
+    assert delay in [1, 2, 3, 4], f"Cannot create a repeater with a delay of {delay}!"
     schem.setblock(v.x, v.y+0, v.z, buildblock)
     schem.setblock(v.x, v.y+1, v.z, f"repeater[delay={delay},facing={cardinal_direction(-facing_direction)},locked={locked},powered={powered}]")
 
@@ -173,7 +173,7 @@ def build_delay(schem, buildblock, v, forward, delay, md, loopback=True):
             delay -= 3
             d_block_u_repeater(schem, buildblock, v, forward, 1)
             d_repeater_u_repeater(schem, buildblock, v, forward, 1, 1)
-        assert delay == 0
+        assert delay == 0, f"There shouldn't be any delay remaining, but it is {delay}!"
         d_loopback_u_block(schem, buildblock, v, forward, loopback)
 
     # 1 tick repeaters everywhere, repeater chaining at the bottom and the top too
@@ -184,7 +184,7 @@ def build_delay(schem, buildblock, v, forward, delay, md, loopback=True):
         while delay > 0:
             delay -= 2
             d_repeater_u_repeater(schem, buildblock, v, forward, 1, 1)
-        assert delay == 0
+        assert delay == 0, f"There shouldn't be any delay remaining, but it is {delay}!"
         d_loopback_u_block(schem, buildblock, v, forward, loopback)
 
     # 2 tick repeaters everywhere, repeater chaining at the bottom needs to end with a 1 tick repeater
@@ -211,7 +211,7 @@ def build_delay(schem, buildblock, v, forward, delay, md, loopback=True):
         while delay > 0:
             delay -= 4
             d_repeater_u_repeater(schem, buildblock, v, forward, 2, 2)
-        assert delay == 0
+        assert delay == 0, f"There shouldn't be any delay remaining, but it is {delay}!"
         d_loopback_u_block(schem, buildblock, v, forward, loopback)
 
     # same as md4, except we can chain 2 tick repeaters everywhere
@@ -220,7 +220,7 @@ def build_delay(schem, buildblock, v, forward, delay, md, loopback=True):
             while delay > 0:
                 delay -= 4
                 d_repeater_u_repeater(schem, buildblock, v, forward, 2, 2)
-            assert delay == 0
+            assert delay == 0, f"There shouldn't be any delay remaining, but it is {delay}!"
             d_loopback_u_block(schem, buildblock, v, forward, loopback)
         else:
             create_delay_md4(schem, buildblock, v, forward, delay, loopback)
@@ -243,7 +243,7 @@ def build_delay(schem, buildblock, v, forward, delay, md, loopback=True):
         while delay > 0:
             delay -= 6
             d_repeater_u_repeater(schem, buildblock, v, forward, 3, 3)
-        assert delay == 0
+        assert delay == 0, f"There shouldn't be any delay remaining, but it is {delay}!"
         d_loopback_u_block(schem, buildblock, v, forward, loopback)
 
     # same as md6, except we can chain 3 tick repeaters everywhere
@@ -252,7 +252,7 @@ def build_delay(schem, buildblock, v, forward, delay, md, loopback=True):
             while delay > 0:
                 delay -= 6
                 d_repeater_u_repeater(schem, buildblock, v, forward, 3, 3)
-            assert delay == 0
+            assert delay == 0, f"There shouldn't be any delay remaining, but it is {delay}!"
             d_loopback_u_block(schem, buildblock, v, forward, loopback)
         else:
             create_delay_md6(schem, buildblock, v, forward, delay, loopback)
@@ -275,7 +275,7 @@ def build_delay(schem, buildblock, v, forward, delay, md, loopback=True):
         while delay > 0:
             delay -= 8
             d_repeater_u_repeater(schem, buildblock, v, forward, 4, 4)
-        assert delay == 0
+        assert delay == 0, f"There shouldn't be any delay remaining, but it is {delay}!"
         d_loopback_u_block(schem, buildblock, v, forward, loopback)
 
     # same as md8, except we can chain 4 tick repeaters everywhere
@@ -284,7 +284,7 @@ def build_delay(schem, buildblock, v, forward, delay, md, loopback=True):
             while delay > 0:
                 delay -= 8
                 d_repeater_u_repeater(schem, buildblock, v, forward, 4, 4)
-            assert delay == 0
+            assert delay == 0, f"There shouldn't be any delay remaining, but it is {delay}!"
             d_loopback_u_block(schem, buildblock, v, forward, loopback)
         else:
             create_delay_md8(schem, buildblock, v, forward, delay, loopback)
