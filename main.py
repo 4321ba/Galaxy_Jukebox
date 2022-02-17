@@ -70,3 +70,5 @@ if __name__ == '__main__':
 # maybe fix the corners of the noteblock sides
 # maybe some more explanation for methods
 # TODO thank lithium+sodium dev
+# fix get_delay_length performance
+# TODO: todo-s in sponge_schematic and split_lines

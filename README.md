@@ -20,3 +20,12 @@ The program currently needs 1.14 for:
 ## Performance
 
 It is bad, though not as terrible as it used to be. It takes 2-30 seconds for one song, depending on the song complexity. Much improvement could be made by rewriting `builder.get_delay_length` to use raw math instead of building the whole thing with `builder.build_delay` and then throwing it away.
+
+## Related
+
+- [Open Noteblock Studio issue](https://github.com/OpenNBS/OpenNoteBlockStudio/issues/310)
+- [ONBS schematic export rework project](https://github.com/OpenNBS/OpenNoteBlockStudio/projects/1)
+- [Noteblock instruments on MC wiki](https://minecraft.fandom.com/wiki/Note_Block#Instruments)
+- [PyNBS, the library for interacting with NBS files](https://github.com/vberlier/pynbs)
+- [NBTLib for the output file](https://github.com/vberlier/nbtlib)
+- [Sponge schematic, output file specification](https://github.com/SpongePowered/Schematic-Specification/blob/master/versions/schematic-2.md)

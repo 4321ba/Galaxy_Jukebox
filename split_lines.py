@@ -231,7 +231,6 @@ class SplitLine:
             while run_again:
                 run_again = False
                 next_length = bld.get_delay_length(delay, md)
-                #print(delay, md, next_length)# TODO
                 
                 # if turns is empty or there's enough space:
                 if not turns or placed_blocks + next_length + 1 < turns[0]:

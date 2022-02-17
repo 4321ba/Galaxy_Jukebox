@@ -25,8 +25,6 @@ class Schematic:
         if block not in self._palette:
             self._palette[block] = nbt.Int(self._palette_index)
             self._palette_index += 1
-        #if "half" in block:
-            #print(block)#TODO
         coords = (x, y, z)
         if coords in self._blocks:
             warn(f"Replacing a perviously set block at {coords} with {block}!")
