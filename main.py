@@ -72,3 +72,4 @@ if __name__ == '__main__':
 # TODO thank lithium+sodium dev
 # fix get_delay_length performance
 # TODO: todo-s in sponge_schematic and split_lines
+# bool redstonelamp or tripwire, to reduce lag bc of lighting updates

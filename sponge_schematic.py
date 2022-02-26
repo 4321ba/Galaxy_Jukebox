@@ -65,16 +65,14 @@ class Schematic:
                     block_data.append(palette_id) # if it's less than 7 digits in binary, just store it
         
         new_file = nbt.File({
-            "Schematic": nbt.Compound({
-                "Version": nbt.Int(2), # format version
-                "DataVersion": nbt.Int(data_version), # Minecraft version
-                "Width": nbt.Short(max_x - min_x + 1),
-                "Height": nbt.Short(max_y - min_y + 1),
-                "Length": nbt.Short(max_z - min_z + 1),
-                "Palette": nbt.Compound(self._palette),
-                "BlockData": nbt.ByteArray(block_data),
-            })
-        }, gzipped=True)
+            "Version": nbt.Int(2), # format version
+            "DataVersion": nbt.Int(data_version), # Minecraft version
+            "Width": nbt.Short(max_x - min_x + 1),
+            "Height": nbt.Short(max_y - min_y + 1),
+            "Length": nbt.Short(max_z - min_z + 1),
+            "Palette": nbt.Compound(self._palette),
+            "BlockData": nbt.ByteArray(block_data),
+        }, gzipped=True, root_name="Schematic")
         new_file.save(path)
 
 # usage:
