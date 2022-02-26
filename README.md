@@ -30,7 +30,7 @@ python3 batch_convert.py
 
 ### Converting one file from command line
 
-If you want to specify the input and output file, you to convert any kind of `.nbs` file into a Sponge schematic:
+If you want to specify the input and output file, you should be able to use this command (the paths are relative to where you opened the terminal):
 
 ```sh
 python3 main.py input.nbs output.schem
