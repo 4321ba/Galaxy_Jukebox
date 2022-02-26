@@ -18,7 +18,7 @@ pip3 install nbtlib pynbs
 
 ### Batch converting
 
-There is a quick little script included for converting one or more files: you can paste the `.nbs` files inside the root folder (`Galaxy_Jukebox` or `Galaxy_Jukebox-main` probably), and double click `batch_convert.py`.
+There is a quick little script included for converting one or more files: you can paste the `.nbs` files inside the root folder (`Galaxy_Jukebox` or `Galaxy_Jukebox-main` probably), and double click `batch_convert.py` there.
 
 If everything is setup correctly, soon you should see the output files in the same directory (it takes a couple of seconds for the conversion).
 
