@@ -2,15 +2,35 @@
 
 Schematic exporter for Minecraft Noteblock Studio, making a galaxy-shaped jukebox that plays the song.
 
+Works with old and new versions of the nbs format, and outputs version 2 of Sponge schematic (it works with WorldEdit e.g.).
+
 ## Usage
 
-This program requires `nbtlib` and `pynbs` to be installed:
+### Installing dependencies
+
+You'll need to install Python3. (Don't forget to add it to path!)
+
+This program also requires `nbtlib` and `pynbs` to be installed:
 
 ```sh
 pip3 install nbtlib pynbs
 ```
 
-After that you should be able to convert any kind of `.nbs` file into a Sponge schematic:
+### Batch converting
+
+There is a quick little script included for converting one or more files: you can paste the `.nbs` files inside the root folder (`Galaxy_Jukebox` or `Galaxy_Jukebox-main` probably), and double click `batch_convert.py`.
+
+If everything is setup correctly, soon you should see the output files in the same directory (it takes a couple of seconds for the conversion).
+
+If it doesn't work, you'll probably see nothing, in that case you should try it through the command line to see the error:
+
+```sh
+python3 batch_convert.py
+```
+
+### Converting one file from command line
+
+If you want to specify the input and output file, you to convert any kind of `.nbs` file into a Sponge schematic:
 
 ```sh
 python3 main.py input.nbs output.schem
