@@ -60,8 +60,11 @@ building_material = [
 ]
 
 even_delay_buildblock = "polished_andesite"
+even_delay_buildblock_slab = "polished_andesite_slab[type=top]"
 odd_delay_buildblock = "polished_granite"
+odd_delay_buildblock_slab = "polished_granite_slab[type=top]"
 start_line_buildblock = "polished_diorite"
+start_line_buildblock_slab = "polished_diorite_slab[type=top]"
 
 def cardinal_direction(v):
     assert v.y==0 and ((abs(v.x)==1 and v.z==0) or (v.x==0 and abs(v.z)==1))

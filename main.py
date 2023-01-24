@@ -64,7 +64,7 @@ if __name__ == '__main__':
     from sys import argv
     convert(argv[1], argv[2])
 
-#TODO: custom instruments
+#TODO: custom instruments (command block playsound?)
 #TODO render distance recommendation sign
 # TODO nbt data to schematic + sign text
 # maybe fix the corners of the noteblock sides
@@ -73,3 +73,4 @@ if __name__ == '__main__':
 # fix get_delay_length performance
 # TODO: todo-s in sponge_schematic and split_lines
 # bool redstonelamp or tripwire, to reduce lag bc of lighting updates
+# gui maybe?

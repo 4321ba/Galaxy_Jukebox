@@ -337,12 +337,12 @@ def bisect_delay_halving_point(remaining_blocks, delay, mind):
 def build_vertical_connection(schem, begin_v, height):
     
     def double_block_and_redstone(schem, andesite_v, rel_granite_v):
-        bld.block_and_redstone(schem, andesite_v, "polished_andesite")
-        bld.block_and_redstone(schem, andesite_v + rel_granite_v, "polished_granite")
+        bld.block_and_redstone(schem, andesite_v, bld.even_delay_buildblock)
+        bld.block_and_redstone(schem, andesite_v + rel_granite_v, bld.odd_delay_buildblock)
         
     def double_block_and_repeater(schem, andesite_v, rel_granite_v, direction):
-        bld.block_and_repeater(schem, andesite_v, "polished_andesite", direction)
-        bld.block_and_repeater(schem, andesite_v + rel_granite_v, "polished_granite", direction)
+        bld.block_and_repeater(schem, andesite_v, bld.even_delay_buildblock, direction)
+        bld.block_and_repeater(schem, andesite_v + rel_granite_v, bld.odd_delay_buildblock, direction)
         
     max_delay = (height - 1) // 3
     for h in range(height):
@@ -353,10 +353,10 @@ def build_vertical_connection(schem, begin_v, height):
             v += forward
         v -= forward
         # corner:
-        bld.block_and_redstone(schem, v + Vector(1, 0, 2), "polished_granite")
-        bld.block_and_redstone(schem, v + Vector(2, 0, 2), "polished_granite")
-        bld.block_and_redstone(schem, v + Vector(2, 0, 1), "polished_granite")
-        bld.block_and_redstone(schem, v + Vector(2, 0, 0), "polished_granite")
+        bld.block_and_redstone(schem, v + Vector(1, 0, 2), bld.odd_delay_buildblock)
+        bld.block_and_redstone(schem, v + Vector(2, 0, 2), bld.odd_delay_buildblock)
+        bld.block_and_redstone(schem, v + Vector(2, 0, 1), bld.odd_delay_buildblock)
+        bld.block_and_redstone(schem, v + Vector(2, 0, 0), bld.odd_delay_buildblock)
         
         forward.rotate()
         v += forward
@@ -377,10 +377,10 @@ def build_vertical_connection(schem, begin_v, height):
         double_block_and_redstone(schem, v, Vector(2, 0, 0))
         v += forward
         if h != height - 1: # we skip the last one
-            bld.block_and_redstone(schem, v + Vector(0, -3, 0), "polished_andesite_slab[type=top]")
-            bld.block_and_redstone(schem, v + Vector(2, -3, 0), "polished_granite_slab[type=top]")
-            bld.block_and_redstone(schem, v + Vector(0, -1, 0), "polished_andesite_slab[type=top]")
-            bld.block_and_redstone(schem, v + Vector(2, -1, 0), "polished_granite_slab[type=top]")
+            bld.block_and_redstone(schem, v + Vector(0, -3, 0), bld.even_delay_buildblock_slab)
+            bld.block_and_redstone(schem, v + Vector(2, -3, 0), bld.odd_delay_buildblock_slab)
+            bld.block_and_redstone(schem, v + Vector(0, -1, 0), bld.even_delay_buildblock_slab)
+            bld.block_and_redstone(schem, v + Vector(2, -1, 0), bld.odd_delay_buildblock_slab)
             v += forward
             if (h+1) % 3 == 0:
                 double_block_and_repeater(schem, v + Vector(0, -3, 0), Vector(2, 0, 0), forward)
@@ -400,40 +400,40 @@ def build_vertical_connection(schem, begin_v, height):
 def build_1gt_delayer(schem, v, forward):
     right = forward.rotated(positive_direction=False)
     up = Vector(0, 1, 0)
-    bld.block_and_redstone(schem, v, "polished_andesite")
-    bld.block_and_redstone(schem, v + right * 2, "polished_granite")
+    bld.block_and_redstone(schem, v, bld.even_delay_buildblock)
+    bld.block_and_redstone(schem, v + right * 2, bld.odd_delay_buildblock)
     v += forward
-    bld.block_and_redstone(schem, v - up, "polished_andesite")
-    bld.block_and_redstone(schem, v + right * 2, "polished_granite")
+    bld.block_and_redstone(schem, v - up, bld.even_delay_buildblock)
+    bld.block_and_redstone(schem, v + right * 2, bld.odd_delay_buildblock)
     v += forward
-    bld.block_and_repeater(schem, v - up, "polished_andesite", -forward)
-    bld.block_and_redstone(schem, v + up, "polished_diorite", powered=True)
-    bld.block_and_repeater(schem, v + right, "polished_diorite", right, powered=True)
-    bld.block_and_repeater(schem, v + right * 2, "polished_andesite", -forward, locked=True)
+    bld.block_and_repeater(schem, v - up, bld.even_delay_buildblock, -forward)
+    bld.block_and_redstone(schem, v + up, bld.start_line_buildblock, powered=True)
+    bld.block_and_repeater(schem, v + right, bld.start_line_buildblock, right, powered=True)
+    bld.block_and_repeater(schem, v + right * 2, bld.even_delay_buildblock, -forward, locked=True)
     v += forward
-    bld.block_and_repeater(schem, v - up, "polished_andesite", -forward)
-    bld.block_and_redstone(schem, v + up, "polished_diorite", powered=True)
+    bld.block_and_repeater(schem, v - up, bld.even_delay_buildblock, -forward)
+    bld.block_and_redstone(schem, v + up, bld.start_line_buildblock, powered=True)
     bld.setblock(schem, v + up + right * 2, f"observer[facing={bld.cardinal_direction(forward)}]")
     v += forward
-    bld.block_and_redstone(schem, v - up, "polished_andesite")
-    bld.block_and_redstone(schem, v + up, "polished_diorite", powered=True)
+    bld.block_and_redstone(schem, v - up, bld.even_delay_buildblock)
+    bld.block_and_redstone(schem, v + up, bld.start_line_buildblock, powered=True)
     bld.setblock(schem, v + right * 2, f"oak_trapdoor[facing={bld.cardinal_direction(-forward)},half=top]")
     bld.setblock(schem, v + right * 2 + up, "scaffolding")
     v += forward
-    bld.block_and_redstone(schem, v - up, "polished_andesite")
-    bld.block_and_redstone(schem, v + up, "polished_diorite", powered=True)
-    bld.block_and_redstone(schem, v + right - up, "polished_andesite")
-    bld.setblock(schem, v + right * 2, "polished_andesite")
+    bld.block_and_redstone(schem, v - up, bld.even_delay_buildblock)
+    bld.block_and_redstone(schem, v + up, bld.start_line_buildblock, powered=True)
+    bld.block_and_redstone(schem, v + right - up, bld.even_delay_buildblock)
+    bld.setblock(schem, v + right * 2, bld.even_delay_buildblock)
     bld.setblock(schem, v + right * 2 + up, "scaffolding")
     v += forward
-    bld.block_and_redstone(schem, v, "polished_diorite", powered=True)
-    bld.block_and_repeater(schem, v + right - up, "polished_diorite", right, powered=True)
-    bld.block_and_repeater(schem, v + right * 2 - up, "polished_diorite", -forward, locked=True)
+    bld.block_and_redstone(schem, v, bld.start_line_buildblock, powered=True)
+    bld.block_and_repeater(schem, v + right - up, bld.start_line_buildblock, right, powered=True)
+    bld.block_and_repeater(schem, v + right * 2 - up, bld.start_line_buildblock, -forward, locked=True)
     v += forward
-    bld.setblock(schem, v, "polished_diorite")
+    bld.setblock(schem, v, bld.start_line_buildblock)
     bld.setblock(schem, v + up, "redstone_torch")
-    bld.block_and_repeater(schem, v + right, "polished_diorite", right, powered=True)
-    bld.block_and_redstone(schem, v + right * 2, "polished_diorite", powered=True)
+    bld.block_and_repeater(schem, v + right, bld.start_line_buildblock, right, powered=True)
+    bld.block_and_redstone(schem, v + right * 2, bld.start_line_buildblock, powered=True)
     v += forward
     v -= up
     return v
@@ -459,7 +459,7 @@ def build_glass_walkway(schem, player_pos, forward, one_gt_delayer_pos, length, 
     v = save_v + right * 2
     forward = right
     goal = one_gt_delayer_pos
-    bld.setblock(schem, v, "polished_diorite")  #TODO constants from bld
+    bld.setblock(schem, v, bld.start_line_buildblock)  #TODO constants from bld
     bld.setblock(schem, v + up, f"stone_button[face=floor,facing={bld.cardinal_direction(forward)}]")
     v += forward
     v -= up
@@ -471,10 +471,10 @@ def build_glass_walkway(schem, player_pos, forward, one_gt_delayer_pos, length, 
         diff_forward = goal.get_coord(forward) - v.get_coord(forward) + 1
         for i in range(diff_forward):
             if rc == 15 or (rc == 14 and i+2 == diff_forward):
-                bld.block_and_repeater(schem, v, "polished_diorite", forward)
+                bld.block_and_repeater(schem, v, bld.start_line_buildblock, forward)
                 rc = 0
             else:
-                bld.block_and_redstone(schem, v, "polished_diorite")
+                bld.block_and_redstone(schem, v, bld.start_line_buildblock)
                 rc += 1
                 if v.y > goal.y:
                     v -= up
