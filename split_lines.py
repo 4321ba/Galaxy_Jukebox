@@ -459,7 +459,7 @@ def build_glass_walkway(schem, player_pos, forward, one_gt_delayer_pos, length, 
     v = save_v + right * 2
     forward = right
     goal = one_gt_delayer_pos
-    bld.setblock(schem, v, bld.start_line_buildblock)  #TODO constants from bld
+    bld.setblock(schem, v, bld.start_line_buildblock)
     bld.setblock(schem, v + up, f"stone_button[face=floor,facing={bld.cardinal_direction(forward)}]")
     v += forward
     v -= up

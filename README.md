@@ -10,10 +10,10 @@ Works with old and new versions of the nbs format, and outputs version 2 of Spon
 
 You'll need to install Python3. (Don't forget to add it to path!)
 
-This program also requires `nbtlib` and `pynbs` to be installed:
+This program also requires `nbtlib` and `mcschematic` to be installed:
 
 ```sh
-pip3 install nbtlib pynbs
+pip3 install nbtlib mcschematic
 ```
 
 ### Batch converting
@@ -63,5 +63,4 @@ It is bad, though not as terrible as it used to be. It takes 2-30 seconds for on
 - [ONBS schematic export rework project](https://github.com/OpenNBS/OpenNoteBlockStudio/projects/1)
 - [Noteblock instruments on MC wiki](https://minecraft.fandom.com/wiki/Note_Block#Instruments)
 - [PyNBS, the library for interacting with NBS files](https://github.com/vberlier/pynbs)
-- [NBTLib for the output file](https://github.com/vberlier/nbtlib)
-- [Sponge schematic, output file specification](https://github.com/SpongePowered/Schematic-Specification/blob/master/versions/schematic-2.md)
+- [MCSchematic for the output file](https://github.com/Sloimayyy/mcschematic)

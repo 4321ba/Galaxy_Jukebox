@@ -81,24 +81,24 @@ def cardinal_direction(v):
 # these 3 functions are used throughout split_lines and here in build_delay, exclusively, to create blocks:
 
 def setblock(schem, v, block):
-    schem.setblock(v.x, v.y, v.z, block)
+    schem.setBlock((v.x, v.y, v.z), block)
 
 def block_and_redstone(schem, v, buildblock, powered=False):
-    schem.setblock(v.x, v.y+0, v.z, buildblock)
-    schem.setblock(v.x, v.y+1, v.z, f"redstone_wire[east=side,north=side,power={15 if powered else 0},south=side,west=side]")
+    schem.setBlock((v.x, v.y+0, v.z), buildblock)
+    schem.setBlock((v.x, v.y+1, v.z), f"redstone_wire[east=side,north=side,power={15 if powered else 0},south=side,west=side]")
     
 def block_and_repeater(schem, v, buildblock, facing_direction, delay=1, locked=False, powered=False):
     assert delay in [1, 2, 3, 4], f"Cannot create a repeater with a delay of {delay}!"
-    schem.setblock(v.x, v.y+0, v.z, buildblock)
-    schem.setblock(v.x, v.y+1, v.z, f"repeater[delay={delay},facing={cardinal_direction(-facing_direction)},locked={locked},powered={powered}]")
+    schem.setBlock((v.x, v.y+0, v.z), buildblock)
+    schem.setBlock((v.x, v.y+1, v.z), f"repeater[delay={delay},facing={cardinal_direction(-facing_direction)},locked={locked},powered={powered}]")
 
 
 # return the space/blocks needed for the delay and md pair
 def get_delay_length(delay, md):
     
     class DummySchematic:
-        def setblock(self, x, y, z, block):
-            pass
+        def setBlock(self, coords, block):
+          pass
     
     schem = DummySchematic()
     v = Vector(0, 0, 0)

@@ -4,7 +4,7 @@ from pynbs import read
 from unsplit_lines import lines_from_song
 from split_lines import SplitLine, build_contraption
 from math import sqrt, ceil
-from sponge_schematic import Schematic
+from mcschematic import MCSchematic, Version
 
 """
 song is either pynbs.File or string (= input path)
@@ -40,7 +40,7 @@ def convert(song, out_path, sides_mode=-1):
     height = int(0.5 + ceil(sqrt( count / (2 * sides_mode) )))
     whole_width = int(0.5 + ceil(count / height))
     
-    schem = Schematic()
+    schem = MCSchematic()
     
     if sides_mode == 1:
         left_width = 0
@@ -57,7 +57,9 @@ def convert(song, out_path, sides_mode=-1):
     
     build_contraption(schem, lines, left_width, middle_width, right_width, height)
     
-    schem.save(out_path)
+    if out_path[-6:] == ".schem": # library adds extension if not present
+        out_path = out_path[:-6]
+    schem.save("", out_path, Version.JE_1_14)
 
 
 if __name__ == '__main__':
