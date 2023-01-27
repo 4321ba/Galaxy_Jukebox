@@ -4,7 +4,7 @@ from pynbs import read
 from unsplit_lines import lines_from_song
 from split_lines import SplitLine, build_contraption
 from math import sqrt, ceil
-from mcschematic import MCSchematic, Version
+from mcschematic_safe import MCSchematic, Version # mcschematic_safe has a warning if we're replacing an already set block with setblock, helping us find bugs/obvious problems in our algorithm
 
 """
 song is either pynbs.File or string (= input path)
@@ -66,13 +66,14 @@ if __name__ == '__main__':
     from sys import argv
     convert(argv[1], argv[2])
 
-#TODO: custom instruments (command block playsound?)
-#TODO render distance recommendation sign
-# TODO nbt data to schematic + sign text
-# maybe fix the corners of the noteblock sides
+# TODO-s:
+# custom instruments (command block playsound?, bool option for cmdblk/dontinclude)
+# sign text (min render distance, name of the song)
+# dummy splitline, and fix the right side ending/last part to be symmetric with left side
 # maybe some more explanation for methods
-# TODO thank lithium+sodium dev
+# thank lithium+sodium dev
 # fix get_delay_length performance
-# TODO: todo-s in sponge_schematic and split_lines
+# todo-s in split_lines
 # bool redstonelamp or tripwire, to reduce lag bc of lighting updates
-# gui maybe?
+
+# upload to pip, and gui 

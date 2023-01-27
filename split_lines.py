@@ -28,7 +28,7 @@ class SplitLine:
         return f"[ProcessedLine i,k:{self.instrument},{self.note} delays:{self._delays}]"
     
     # serves as a post-initialization, where it gets its position, and other attributes
-    def begin_circuit(self, schem, pos, forward, side, dist_to_middle, col, row):
+    def begin_circuit(self, schem, pos, forward, side, dist_to_middle, row, max_row, col, side_col, max_col):
         self._schem = schem
         pos.y -= 1 # pos.y is where the noteblock is, but it's better to store the block below
         self._pos = pos
@@ -37,14 +37,34 @@ class SplitLine:
         # the blocks this line needs to go sideways and forward to be aligned with the side "middle"
         # it correlates with the column it is in
         self._dist_to_middle = dist_to_middle
-        self.col = col # the column, absolute, and every column has the same height (the checkerboard pattern): every row×col has a noteblock
-        self.row = row
         self._buildblock = bld.building_material[self.instrument]
-        
+
+        self.row = row # the odd rows are 1 block to the right compared to the even rows
+        self._max_row = max_row # the height of the thing
+        # the column, absolute, and every column has the same height (the checkerboard pattern): every row×col has exactly one noteblock (if inside the range)
+        self.col = col # goes from 0, and up everytime
+        self._side_col = side_col # goes from 0 up, but goes back to 0 when on the next side (there are 1, 2 or 3 sides)
+        self._max_col = max_col # the max number of columns *on the same side* that the line is on (left/middle/right width)
+    
     def get_pos(self):
         return self._pos
     
-    def build_noteblock(self, max_row): # max_row, a.k.a. height
+    def build_noteblock(self):
+
+        def conditional_patch_above_below(vec):
+            # patching above the 2nd row so it has the same height as the neighbors
+            if self.row == 1:
+                bld.setblock(self._schem, vec + up * 3, self._buildblock)
+                bld.setblock(self._schem, vec + up * 4, self._buildblock)
+            # below the 2nd to last row as well
+            # we also want an extra row of blocks under the wall, so it looks better 
+            if self.row == self._max_row - 2:
+                bld.setblock(self._schem, vec - up * 4, self._buildblock)
+                bld.setblock(self._schem, vec - up * 3, self._buildblock)
+                bld.setblock(self._schem, vec - up * 2, self._buildblock)
+            elif self.row == self._max_row - 1:
+                bld.setblock(self._schem, vec - up * 2, self._buildblock)
+
         v = self._pos
         up = Vector(0, 1, 0)
         bld.setblock(self._schem, v - up, "redstone_lamp")
@@ -54,13 +74,25 @@ class SplitLine:
         bld.block_and_redstone(self._schem, v - up, self._buildblock)
         bld.setblock(self._schem, v + up * 1, self._buildblock)
         bld.setblock(self._schem, v + up * 2, self._buildblock)
-        # patching above the 2nd to first row and below the 2nd to last row, so it stays on level
-        if self.row == 1:
-            bld.setblock(self._schem, v + up * 3, self._buildblock)
-            bld.setblock(self._schem, v + up * 4, self._buildblock)
-        if self.row == max_row - 2:
-            bld.setblock(self._schem, v - up * 3, self._buildblock)
-            bld.setblock(self._schem, v - up * 2, self._buildblock)
+
+        conditional_patch_above_below(v)
+        # we also patch next to the first and the last column
+        # for the first and the last col of every side, we add one more continuous pile of blocks to the left/right
+        if self._side_col == 0 and self.row % 2 == 0:
+            left = self._forward.rotated()
+            bld.setblock(self._schem, v + left + up * 2, self._buildblock)
+            bld.setblock(self._schem, v + left + up * 1, self._buildblock)
+            bld.setblock(self._schem, v + left + up * 0, self._buildblock)
+            bld.setblock(self._schem, v + left - up * 1, self._buildblock)
+            conditional_patch_above_below(v + left)
+        if self._side_col == self._max_col - 1 and self.row % 2 == 1:
+            right = self._forward.rotated(positive_direction=False)
+            bld.setblock(self._schem, v + right + up * 2, self._buildblock)
+            bld.setblock(self._schem, v + right + up * 1, self._buildblock)
+            bld.setblock(self._schem, v + right + up * 0, self._buildblock)
+            bld.setblock(self._schem, v + right - up * 1, self._buildblock)
+            conditional_patch_above_below(v + right)
+
         v += self._forward
         bld.block_and_repeater(self._schem, v, self._buildblock, -self._forward)
         v += self._forward
@@ -101,9 +133,9 @@ class SplitLine:
         assert placed_delay <= max_delay, f"Somehow we placed more delay then allowed, when turning, placed {placed_delay}, allowed {delay} (in col {self.col} row {self.row})!"
         self._delays[0] += max_delay - placed_delay # adding the remaining needed delay, to be in sync with the others
         
-    def build_vertical_adjustment(self, max_row): # max_row, a.k.a. height
+    def build_vertical_adjustment(self):
         v = self._pos
-        max_needed_diff = max_row - 1
+        max_needed_diff = self._max_row - 1
         needed_diff = max_needed_diff - 2 * self.row
         for i in range(max_needed_diff + 1):
             if i + abs(needed_diff) > max_needed_diff:
@@ -446,8 +478,13 @@ def build_glass_walkway(schem, player_pos, forward, one_gt_delayer_pos, length, 
         bld.setblock(schem, v, "glass")
         bld.setblock(schem, v + right, "glass")
         v += forward
+    bld.setblock(schem, v + up - forward + right,
+        "birch_sign[rotation=8]{"
+        "Text1: '{\"text\":\"Created with\"}', "
+        "Text2: '{\"text\":\"Note Block Studio\"}', "
+        "Text3: '{\"text\":\"Render distance\"}', "
+        "Text4: '{\"text\":\"must be quite big!\"}'}")
     bld.setblock(schem, v + up - forward, "birch_sign[rotation=8]")
-    bld.setblock(schem, v + up - forward + right, "birch_sign[rotation=8]")#TODO no blockentity yet
     save_v = v.copy()
     for i in range(depth):
         bld.setblock(schem, v, "glass")
@@ -511,8 +548,8 @@ def build_contraption(schem, lines, left_width, middle_width, right_width, heigh
                     return index
                 # this is needed for the turn:
                 dist_to_middle = 0 if side == "middle" else (2 * width - col if side == "left" else col + 1)
-                real_col = prev_width + col // 2 # not taking the zig-zagging into account
-                lines[index].begin_circuit(schem, v - Vector(0, 4 * row, 0), forward.rotated(), side, dist_to_middle, real_col, 2*row + col%2)
+                real_col = prev_width + col // 2 # not taking the zig-zagging into account, meaning one column here is 2 blocks wide
+                lines[index].begin_circuit(schem, v - Vector(0, 4 * row, 0), forward.rotated(), side, dist_to_middle, 2*row + col%2, height, real_col, col//2, width)
                 index += 1
         return index
     
@@ -536,9 +573,9 @@ def build_contraption(schem, lines, left_width, middle_width, right_width, heigh
     # but at the 2 ends they may place the repeater 1 block sooner, hence +2
     turn_max_delay = (2*2 * shallow_depth + 2) // 16 + 1 # +1 for the extra repeater at the end
     for line in lines:
-        line.build_noteblock(height)
+        line.build_noteblock()
         line.build_side_turn(turn_max_delay)
-        line.build_vertical_adjustment(height)
+        line.build_vertical_adjustment()
         line.build_horizontal_adjustment()
     
     bottom_connection_pos = build_vertical_connection(schem, lines[0].get_pos() + Vector(2, 3, 0), height)
