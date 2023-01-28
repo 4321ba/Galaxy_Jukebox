@@ -95,6 +95,13 @@ def block_and_repeater(schem, v, buildblock, facing_direction, delay=1, locked=F
 
 # return the space/blocks needed for the delay and md pair
 def get_delay_length(delay, md):
+    assert 2 <= min(md, 9) <= delay, f"Wrong parameters {delay} and {md} for get_delay_length!"
+    len1 = get_delay_length_blockplacing(delay, md)
+    len2 = get_delay_length_math(delay, md)
+    assert len1 == len2, f"2 lengths {len1} and {len2} aren't the same!"
+    return len1
+
+def get_delay_length_blockplacing(delay, md):
     
     class DummySchematic:
         def setBlock(self, coords, block):
@@ -105,6 +112,24 @@ def get_delay_length(delay, md):
     forward = Vector(0, 0, 1)
     build_delay(schem, "", v, forward, delay, md)
     return v.z
+
+def get_delay_length_math(delay, md):
+    if md == 2:
+        return int(delay / 1.5 + 1.5) # +0.5 for rounding
+    if md == 3:
+        return int(delay / 2 + 1.75) # +0.25 for rounding
+    if md == 4:
+        return int(delay / 4 + 2.125) if delay != 4 else 2
+    if md == 5:
+        return int(delay / 4 + 1.875)
+    if md == 6:
+        return int(delay / 6 + 2.08) if delay != 6 else 2 # 0.08 is approx. 1/12
+    if md == 7:
+        return int(delay / 6 + 1.92)
+    if md == 8:
+        return int(delay / 8 + 2.0625) if delay != 8 else 2
+    return int(delay / 8 + 1.9375)
+
 
 """
 creates the delay in the form:
@@ -128,6 +153,7 @@ if loopback is false, the redstone at the end won't get placed, making it useful
 v is modified to represent the actual position!
 """
 def build_delay(schem, buildblock, v, forward, delay, md, loopback=True):
+    assert 2 <= min(md, 9) <= delay, f"Wrong parameters {delay} and {md} for get_delay_length!"
     
     
     # helper functions for e.g.: placing a redstone down and a repeater up
