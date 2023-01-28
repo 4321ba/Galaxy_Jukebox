@@ -382,41 +382,41 @@ def build_vertical_connection(schem, begin_v, height):
         bld.block_and_repeater(schem, andesite_v, bld.even_delay_buildblock, direction)
         bld.block_and_repeater(schem, andesite_v + rel_granite_v, bld.odd_delay_buildblock, direction)
         
-    for h in range(height):
+    forward = Vector(1, 0, 0)
+    for h in range(height - 1):
         v = begin_v - Vector(0, 4 * h, 0)
-        forward = Vector(1, 0, 0)
-        
         double_block_and_redstone(schem, v, Vector(0, 0, 2))
         v += forward
-        if h != height - 1: # we skip the last one
-            bld.block_and_redstone(schem, v + Vector(0, -3, 0), bld.even_delay_buildblock_slab)
-            bld.block_and_redstone(schem, v + Vector(0, -3, 2), bld.odd_delay_buildblock_slab)
-            bld.block_and_redstone(schem, v + Vector(0, -1, 0), bld.even_delay_buildblock_slab)
-            bld.block_and_redstone(schem, v + Vector(0, -1, 2), bld.odd_delay_buildblock_slab)
+        bld.block_and_redstone(schem, v + Vector(0, -3, 0), bld.even_delay_buildblock_slab)
+        bld.block_and_redstone(schem, v + Vector(0, -3, 2), bld.odd_delay_buildblock_slab)
+        bld.block_and_redstone(schem, v + Vector(0, -1, 0), bld.even_delay_buildblock_slab)
+        bld.block_and_redstone(schem, v + Vector(0, -1, 2), bld.odd_delay_buildblock_slab)
+        v += forward
+        if (h+1) % 3 == 0:
+            double_block_and_repeater(schem, v + Vector(0, -3, 0), Vector(0, 0, 2), forward)
+            double_block_and_redstone(schem, v + Vector(0, -1, 0), Vector(0, 0, 2))
             v += forward
-            if (h+1) % 3 == 0:
-                double_block_and_repeater(schem, v + Vector(0, -3, 0), Vector(0, 0, 2), forward)
-                double_block_and_redstone(schem, v + Vector(0, -1, 0), Vector(0, 0, 2))
-                v += forward
-            double_block_and_redstone(schem, v + Vector(0, -2, 0), Vector(0, 0, 2))
-            v += forward
-        else:
-            v += Vector(0, -1, 0)
-            double_block_and_repeater(schem, v, Vector(0, 0, 2), -forward)
-            v += forward
-            double_block_and_redstone(schem, v, Vector(0, 0, 2))
-            v += forward
-            double_block_and_redstone(schem, v, Vector(0, 0, 2))
-            # corner:
-            bld.block_and_redstone(schem, v + Vector(1, 0, 2), bld.odd_delay_buildblock)
-            bld.block_and_redstone(schem, v + Vector(2, 0, 2), bld.odd_delay_buildblock)
-            bld.block_and_redstone(schem, v + Vector(2, 0, 1), bld.odd_delay_buildblock)
-            bld.block_and_redstone(schem, v + Vector(2, 0, 0), bld.odd_delay_buildblock)
-            
-            forward.rotate()
-            v += forward
-            end_v = v
-    return end_v
+        double_block_and_redstone(schem, v + Vector(0, -2, 0), Vector(0, 0, 2))
+    
+    # last one separately
+    v = begin_v - Vector(0, 4 * (height - 1), 0)
+    double_block_and_redstone(schem, v, Vector(0, 0, 2))
+    v += forward
+    v += Vector(0, -1, 0)
+    double_block_and_repeater(schem, v, Vector(0, 0, 2), -forward)
+    v += forward
+    double_block_and_redstone(schem, v, Vector(0, 0, 2))
+    v += forward
+    double_block_and_redstone(schem, v, Vector(0, 0, 2))
+    # corner:
+    bld.block_and_redstone(schem, v + Vector(1, 0, 2), bld.odd_delay_buildblock)
+    bld.block_and_redstone(schem, v + Vector(2, 0, 2), bld.odd_delay_buildblock)
+    bld.block_and_redstone(schem, v + Vector(2, 0, 1), bld.odd_delay_buildblock)
+    bld.block_and_redstone(schem, v + Vector(2, 0, 0), bld.odd_delay_buildblock)
+    
+    forward.rotate()
+    v += forward
+    return v
 
 # v is the coordinate of the block before the andesite/even gt repeater, at the bottom
 # v + Vector(2, 0, 0) is the block before the granite/odd gt repeater
