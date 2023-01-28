@@ -39,6 +39,7 @@ class SplitLine:
         self._dist_to_middle = dist_to_middle
         self._buildblock = bld.building_material[self.instrument]
 
+        assert side_col < max_col and row < max_row, "Given row or col is out of bounds!"
         self.row = row # the odd rows are 1 block to the right compared to the even rows
         self._max_row = max_row # the height of the thing
         # the column, absolute, and every column has the same height (the checkerboard pattern): every row×col has exactly one noteblock (if inside the range)
@@ -223,6 +224,10 @@ class SplitLine:
         # adding to before the first note, it needs delay because of the repeaters of where the signal comes from
         self._delays[0] += max_delay - self.col // 2
     
+    # this is the delay needed to build the vertical connection (15 block limit), above this line, as compensation
+    def add_delay_for_vertical_connection(self):
+        self._delays[0] += self.row // 3
+    
     
     """
     <> : repeater
@@ -366,6 +371,7 @@ def bisect_delay_halving_point(remaining_blocks, delay, mind):
 
 
 # begin_v is the coordinate of the even (andesite) connector of the very first (upper left) noteblock line
+# delay compensation for extra added repeaters is in line.add_delay_for_vertical_connection()
 def build_vertical_connection(schem, begin_v, height):
     
     def double_block_and_redstone(schem, andesite_v, rel_granite_v):
@@ -376,53 +382,38 @@ def build_vertical_connection(schem, begin_v, height):
         bld.block_and_repeater(schem, andesite_v, bld.even_delay_buildblock, direction)
         bld.block_and_repeater(schem, andesite_v + rel_granite_v, bld.odd_delay_buildblock, direction)
         
-    max_delay = (height - 1) // 3
     for h in range(height):
         v = begin_v - Vector(0, 4 * h, 0)
         forward = Vector(1, 0, 0)
-        for i in range(4):
-            double_block_and_redstone(schem, v, Vector(0, 0, 2))
-            v += forward
-        v -= forward
-        # corner:
-        bld.block_and_redstone(schem, v + Vector(1, 0, 2), bld.odd_delay_buildblock)
-        bld.block_and_redstone(schem, v + Vector(2, 0, 2), bld.odd_delay_buildblock)
-        bld.block_and_redstone(schem, v + Vector(2, 0, 1), bld.odd_delay_buildblock)
-        bld.block_and_redstone(schem, v + Vector(2, 0, 0), bld.odd_delay_buildblock)
         
-        forward.rotate()
-        v += forward
-        #TODO integrate this also into _delays[0] , maybe fit it before the turn??
-        needed_delay = h // 3
-        for i in range(max_delay):
-            if (i+9) % 16 == 0:
-                double_block_and_repeater(schem, v, Vector(2, 0, 0), -forward)
-                v += forward
-            if i < needed_delay:
-                double_block_and_repeater(schem, v, Vector(2, 0, 0), -forward)
-            else:
-                double_block_and_redstone(schem, v, Vector(2, 0, 0))
-            v += forward
-            
-        double_block_and_repeater(schem, v, Vector(2, 0, 0), -forward)
-        v += forward
-        double_block_and_redstone(schem, v, Vector(2, 0, 0))
+        double_block_and_redstone(schem, v, Vector(0, 0, 2))
         v += forward
         if h != height - 1: # we skip the last one
             bld.block_and_redstone(schem, v + Vector(0, -3, 0), bld.even_delay_buildblock_slab)
-            bld.block_and_redstone(schem, v + Vector(2, -3, 0), bld.odd_delay_buildblock_slab)
+            bld.block_and_redstone(schem, v + Vector(0, -3, 2), bld.odd_delay_buildblock_slab)
             bld.block_and_redstone(schem, v + Vector(0, -1, 0), bld.even_delay_buildblock_slab)
-            bld.block_and_redstone(schem, v + Vector(2, -1, 0), bld.odd_delay_buildblock_slab)
+            bld.block_and_redstone(schem, v + Vector(0, -1, 2), bld.odd_delay_buildblock_slab)
             v += forward
             if (h+1) % 3 == 0:
-                double_block_and_repeater(schem, v + Vector(0, -3, 0), Vector(2, 0, 0), forward)
-                double_block_and_redstone(schem, v + Vector(0, -1, 0), Vector(2, 0, 0))
+                double_block_and_repeater(schem, v + Vector(0, -3, 0), Vector(0, 0, 2), forward)
+                double_block_and_redstone(schem, v + Vector(0, -1, 0), Vector(0, 0, 2))
                 v += forward
-            double_block_and_redstone(schem, v + Vector(0, -2, 0), Vector(2, 0, 0))
+            double_block_and_redstone(schem, v + Vector(0, -2, 0), Vector(0, 0, 2))
             v += forward
         else:
             v += Vector(0, -1, 0)
-            double_block_and_repeater(schem, v, Vector(2, 0, 0), -forward)
+            double_block_and_repeater(schem, v, Vector(0, 0, 2), -forward)
+            v += forward
+            double_block_and_redstone(schem, v, Vector(0, 0, 2))
+            v += forward
+            double_block_and_redstone(schem, v, Vector(0, 0, 2))
+            # corner:
+            bld.block_and_redstone(schem, v + Vector(1, 0, 2), bld.odd_delay_buildblock)
+            bld.block_and_redstone(schem, v + Vector(2, 0, 2), bld.odd_delay_buildblock)
+            bld.block_and_redstone(schem, v + Vector(2, 0, 1), bld.odd_delay_buildblock)
+            bld.block_and_redstone(schem, v + Vector(2, 0, 0), bld.odd_delay_buildblock)
+            
+            forward.rotate()
             v += forward
             end_v = v
     return end_v
@@ -577,6 +568,7 @@ def build_contraption(schem, lines, left_width, middle_width, right_width, heigh
         line.build_side_turn(turn_max_delay)
         line.build_vertical_adjustment()
         line.build_horizontal_adjustment()
+        line.add_delay_for_vertical_connection()
     
     bottom_connection_pos = build_vertical_connection(schem, lines[0].get_pos() + Vector(2, 3, 0), height)
     bottom_connection_pos = build_1gt_delayer(schem, bottom_connection_pos, Vector(0, 0, -1))
