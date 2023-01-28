@@ -72,7 +72,6 @@ if __name__ == '__main__':
 # dummy splitline, and fix the right side ending/last part to be symmetric with left side
 # maybe some more explanation for methods
 # thank lithium+sodium dev
-# fix get_delay_length performance, cleanup + readme update
 # todo-s in split_lines
 # bool redstonelamp or tripwire, to reduce lag bc of lighting updates
 # go back to original mcschematic

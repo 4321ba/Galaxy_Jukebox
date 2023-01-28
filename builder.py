@@ -93,27 +93,12 @@ def block_and_repeater(schem, v, buildblock, facing_direction, delay=1, locked=F
     schem.setBlock((v.x, v.y+1, v.z), f"repeater[delay={delay},facing={cardinal_direction(-facing_direction)},locked={locked},powered={powered}]")
 
 
-# return the space/blocks needed for the delay and md pair
+# return the space/blocks/length needed for the delay-md pair, when built by build_delay
+# for the previous implementation of this function, see commit
+# https://github.com/4321ba/Galaxy_Jukebox/commit/7fa774baea0a696d32a1dadd3fbe13be6f24ac02
+# and lines https://github.com/4321ba/Galaxy_Jukebox/blob/7fa774baea0a696d32a1dadd3fbe13be6f24ac02/builder.py#L96-L131
 def get_delay_length(delay, md):
     assert 2 <= min(md, 9) <= delay, f"Wrong parameters {delay} and {md} for get_delay_length!"
-    len1 = get_delay_length_blockplacing(delay, md)
-    len2 = get_delay_length_math(delay, md)
-    assert len1 == len2, f"2 lengths {len1} and {len2} aren't the same!"
-    return len1
-
-def get_delay_length_blockplacing(delay, md):
-    
-    class DummySchematic:
-        def setBlock(self, coords, block):
-          pass
-    
-    schem = DummySchematic()
-    v = Vector(0, 0, 0)
-    forward = Vector(0, 0, 1)
-    build_delay(schem, "", v, forward, delay, md)
-    return v.z
-
-def get_delay_length_math(delay, md):
     if md == 2:
         return int(delay / 1.5 + 1.5) # +0.5 for rounding
     if md == 3:
