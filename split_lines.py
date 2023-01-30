@@ -461,7 +461,7 @@ def build_1gt_delayer(schem, v, forward):
     v -= up
     return v
 
-def build_glass_walkway(schem, player_pos, forward, one_gt_delayer_pos, length, depth):
+def build_glass_walkway(schem, player_pos, forward, one_gt_delayer_pos, length, depth, title, min_render_dist):
     right = forward.rotated(positive_direction=False)
     up = Vector(0, 1, 0)
     v = player_pos - up - forward
@@ -469,13 +469,25 @@ def build_glass_walkway(schem, player_pos, forward, one_gt_delayer_pos, length, 
         bld.setblock(schem, v, "glass")
         bld.setblock(schem, v + right, "glass")
         v += forward
+
     bld.setblock(schem, v + up - forward + right,
         "birch_sign[rotation=8]{"
         "Text1: '{\"text\":\"Created with\"}', "
         "Text2: '{\"text\":\"Note Block Studio\"}', "
         "Text3: '{\"text\":\"Render distance\"}', "
-        "Text4: '{\"text\":\"must be quite big!\"}'}")
-    bld.setblock(schem, v + up - forward, "birch_sign[rotation=8]")
+        "Text4: '{\"text\":\"must be >= " + str(min_render_dist) + " !\"}'}")
+    # 15 characters for sure fit onto one row of the sign
+    title_1 = title[0:15]
+    title_2 = title[15:30]
+    title_3 = title[30:45]
+    title_4 = title[45:60]
+    bld.setblock(schem, v + up - forward,
+        "birch_sign[rotation=8]{"
+        "Text1: '{\"text\":\"" + title_1 + "\"}', "
+        "Text2: '{\"text\":\"" + title_2 + "\"}', "
+        "Text3: '{\"text\":\"" + title_3 + "\"}', "
+        "Text4: '{\"text\":\"" + title_4 + "\"}'}")
+
     save_v = v.copy()
     for i in range(depth):
         bld.setblock(schem, v, "glass")
@@ -518,8 +530,20 @@ def build_glass_walkway(schem, player_pos, forward, one_gt_delayer_pos, length, 
     assert v.y == goal.y, "Somehow the diorite line is not aligned well vertically!"
 
 
+# should be called after the majority of the building is done
+def calculate_min_render_distance_needed(schem):
+    schem_bounds = schem._structure.getBounds() # not so nice attacking schem's private territories, but it's not exposed
+    # assuming player is at 0,0,0 (that's the middle of the contraption)
+    max_distance = max(-schem_bounds[0][0], -schem_bounds[0][2], schem_bounds[1][0], schem_bounds[1][2])
+    # https://minecraft.fandom.com/wiki/Chunk#Level_and_load_type
+    # a render distance of 5 e.g. means ■□□□■ that if I'm standing in the right white chunk, the
+    # redstone in the left white chunk is just barely loaded (tested with 1.17.1 Singleplayer)
+    # so if there's a distance of 50 e.g. between me and my redstone, we'd recommend a render distance of
+    # at least 3+2
+    return max_distance // 16 + 2
 
-def build_contraption(schem, lines, left_width, middle_width, right_width, height):
+
+def build_contraption(schem, lines, left_width, middle_width, right_width, height, title):
     width = left_width + middle_width + right_width
     assert 1 <= len(lines) <= width * height, f"There are {len(lines)} lines, but only {width * height} places for them!"
     view_distance = max(left_width, right_width, middle_width) # this is the space between player pos and middle side
@@ -572,9 +596,8 @@ def build_contraption(schem, lines, left_width, middle_width, right_width, heigh
     
     bottom_connection_pos = build_vertical_connection(schem, lines[0].get_pos() + Vector(2, 3, 0), height)
     bottom_connection_pos = build_1gt_delayer(schem, bottom_connection_pos, Vector(0, 0, -1))
-    # at least one block, otherwise just enough to go around the left side:
+    # glass walkway length, at least one block, otherwise just enough to go around the left side:
     walkway_length = max(1, left_width * 2 - view_distance)
-    build_glass_walkway(schem, player_pos, Vector(0, 0, -1), bottom_connection_pos, walkway_length, 10)# TODO 10 deep ladder
     
     # there will be a repeater every 4th block on the horizontal line that gives the signal to the whole thing
     junction_delay = (width - 1) // 2 
@@ -601,3 +624,6 @@ def build_contraption(schem, lines, left_width, middle_width, right_width, heigh
             turns.append(x_difference + 4 * line.col)
             x_difference += 2 * width
         line.build_delays(turns)
+
+    min_render_dist = calculate_min_render_distance_needed(schem)
+    build_glass_walkway(schem, player_pos, Vector(0, 0, -1), bottom_connection_pos, walkway_length, 10, title, min_render_dist)# TODO 10 deep ladder

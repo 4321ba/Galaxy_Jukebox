@@ -1,10 +1,26 @@
 #!/usr/bin/env python3
 
+from os.path import basename
 from pynbs import read
 from unsplit_lines import lines_from_song
 from split_lines import SplitLine, build_contraption
 from math import sqrt, ceil
 from mcschematic_safe import MCSchematic, Version # mcschematic_safe has a warning if we're replacing an already set block with setblock, helping us find bugs/obvious problems in our algorithm
+
+# filename can be empty string
+def get_title(song, filename):
+    title = song.header.song_name
+    if title == "" and filename != "":
+        title = basename(filename)
+    if title == "" and song.header.song_origin != "":
+        title = "From " + song.header.song_origin
+    if title == "":
+        title = "Unnamed song"
+    if song.header.song_author != "":
+        title += " by " + song.header.song_author
+    if song.header.original_author != "":
+        title += " orig.: " + song.header.original_author
+    return title
 
 """
 song is either pynbs.File or string (= input path)
@@ -15,9 +31,13 @@ sides_mode is how many sides the noteblocks should have (-1, or between 1 and 3)
 3: 2n×n rectangles on all 3 sides
 """
 def convert(song, out_path, sides_mode=-1):
+    filename = ""
     if type(song) == str:
+        filename = song
         song = read(song)
     
+    title = get_title(song, filename)
+
     unsplit_lines = lines_from_song(song)
     lines = []
     # converting from UnsplitLine to SplitLine
@@ -55,7 +75,7 @@ def convert(song, out_path, sides_mode=-1):
         middle_width = whole_width - 2 * left_width
         right_width = left_width
     
-    build_contraption(schem, lines, left_width, middle_width, right_width, height)
+    build_contraption(schem, lines, left_width, middle_width, right_width, height, title)
     
     if out_path[-6:] == ".schem": # library adds extension if not present
         out_path = out_path[:-6]
@@ -67,7 +87,6 @@ if __name__ == '__main__':
     convert(argv[1], argv[2])
 
 # TODO-s:
-# sign text (min render distance, name of the song)
 # dummy splitline, and fix the right side ending/last part to be symmetric with left side
 # maybe some more explanation for methods
 # thank lithium+sodium dev
