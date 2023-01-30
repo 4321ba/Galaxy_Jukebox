@@ -67,7 +67,6 @@ if __name__ == '__main__':
     convert(argv[1], argv[2])
 
 # TODO-s:
-# custom instruments (command block playsound?, bool option for cmdblk/dontinclude)
 # sign text (min render distance, name of the song)
 # dummy splitline, and fix the right side ending/last part to be symmetric with left side
 # maybe some more explanation for methods
@@ -77,3 +76,6 @@ if __name__ == '__main__':
 # go back to original mcschematic
 
 # upload to pip, and gui 
+
+# maybe support for custom instruments (command block playsound and bool option for including it or not)
+# support for different volumes, panning (position of the noteblock), and maybe pitch fine tuning (command block playsound)

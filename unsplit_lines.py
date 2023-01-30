@@ -75,6 +75,9 @@ def lines_from_song(song, override_tempo=-1):
     lines = {} # indexed with (key, instrument)
     for tick, chord in song:
         for note in chord:
+            # skipping custom instruments (whose indices are above the vanilla noteblock count)
+            if note.instrument >= song.header.default_instruments:
+                continue
             code = (note.key, note.instrument)
             if code not in lines:
                 lines[code] = UnsplitLine(note.key, note.instrument)
