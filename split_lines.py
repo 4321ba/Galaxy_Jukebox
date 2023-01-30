@@ -532,7 +532,7 @@ def build_glass_walkway(schem, player_pos, forward, one_gt_delayer_pos, length, 
 
 # should be called after the majority of the building is done
 def calculate_min_render_distance_needed(schem):
-    schem_bounds = schem._structure.getBounds() # not so nice attacking schem's private territories, but it's not exposed
+    schem_bounds = schem.getStructure().getBounds()
     # assuming player is at 0,0,0 (that's the middle of the contraption)
     max_distance = max(-schem_bounds[0][0], -schem_bounds[0][2], schem_bounds[1][0], schem_bounds[1][2])
     # https://minecraft.fandom.com/wiki/Chunk#Level_and_load_type
