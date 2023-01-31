@@ -40,7 +40,9 @@ Be sure to tell me if something ain't right, e.g. by opening an [issue](https://
 
 ## Current state
 
-The program is feature complete, but there are some some more things I may want to do.
+The program is quite complete, but there are some some more things I may want to do.
+
+If you're interested in how it works, you can read [the documentation](documentation.md)!
 
 ## Minecraft version
 
@@ -57,10 +59,14 @@ The program currently needs 1.14 for:
 
 It is fine in my opinion, it takes 12 seconds to convert the 10 minute version of Genesis of the End on my machine (not a beast).
 
+## Huge thanks to these projects!
+- [OpenNBS](https://github.com/OpenNBS/OpenNoteBlockStudio), the program for creating note block music
+- [PyNBS](https://github.com/vberlier/pynbs), the library for interacting with NBS files
+- [MCSchematic](https://github.com/Sloimayyy/mcschematic), for creating the output schematic file
+- [Lithium](https://www.curseforge.com/minecraft/mc-mods/lithium), [Sodium](https://www.curseforge.com/minecraft/mc-mods/sodium) and [Phosphor](https://www.curseforge.com/minecraft/mc-mods/phosphor) for optimizing the game enough for it to be able to play more complex pieces
+
 ## Related
 
 - [Open Noteblock Studio issue](https://github.com/OpenNBS/OpenNoteBlockStudio/issues/310)
 - [ONBS schematic export rework project](https://github.com/OpenNBS/OpenNoteBlockStudio/projects/1)
 - [Noteblock instruments on MC wiki](https://minecraft.fandom.com/wiki/Note_Block#Instruments)
-- [PyNBS, the library for interacting with NBS files](https://github.com/vberlier/pynbs)
-- [MCSchematic for the output file](https://github.com/Sloimayyy/mcschematic)

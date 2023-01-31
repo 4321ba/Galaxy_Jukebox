@@ -65,6 +65,8 @@ class UnsplitLine:
 
 # needs a pynbs.File song and
 # gives back a list of UnsplitLines that are ready to be converted to SplitLines
+# separates the different instrument-pitch noteblocks from the song
+# after that it also splits these into multiple lines if needed
 def lines_from_song(song, override_tempo=-1):
     # this is hardcoded as in NBS there isn't a 6.67 tps option, so
     # 6.75 almost always wants to mean every 3 gameticks

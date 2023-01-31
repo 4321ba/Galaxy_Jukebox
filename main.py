@@ -87,14 +87,12 @@ if __name__ == '__main__':
     convert(argv[1], argv[2])
 
 # TODO-s:
-# dummy splitline, and fix the right side ending/last part to be symmetric with left side
-# maybe some more explanation for methods
-# thank lithium+sodium dev
 # todo-s in split_lines
 # bool redstonelamp or tripwire, to reduce lag bc of lighting updates
+# /fill: fix the right side ending/last part to be symmetric with left side
 # go back to original mcschematic
 
 # upload to pip, and gui 
 
 # maybe support for custom instruments (command block playsound and bool option for including it or not)
-# support for different volumes, panning (position of the noteblock), and maybe pitch fine tuning (command block playsound)
+# support for different volumes, panning (position of the noteblock, dummy splitline), and maybe pitch fine tuning (command block playsound)
