@@ -19,6 +19,7 @@ class SplitLine:
         ticks = sorted(ticks) # sorted list, count (it was the value of the dict) is no longer needed
         assert ticks, "SplitLine shouldn't be initialized with empty ticks!"
         self._is_even = ticks[0] % 2 == 0
+        self.max_duration = ticks[-1] // 2 # this is for guessing how many turns are needed
         # adding 4gt to the first delay value (as if the 0th note was at gametick -4), to make it behave like the rest of the delays
         # //2: from gametick to redstone tick, _is_even remembers if this is an odd line
         self._delays = [(4 + ticks[0]) // 2] + [(ticks[i+1] - ticks[i]) // 2 for i in range(len(ticks) - 1)]
@@ -271,6 +272,7 @@ class SplitLine:
                 run_again = False
                 next_length = bld.get_delay_length(delay, md)
                 
+                assert turns, "Turns shouldn't run out! Line will escape into the horizon and further!"
                 # if turns is empty or there's enough space:
                 if not turns or placed_blocks + next_length + 1 < turns[0]:
                     bld.build_delay(self._schem, self._buildblock, v, self._forward, delay, md)
@@ -533,6 +535,8 @@ def build_glass_walkway(schem, player_pos, forward, one_gt_delayer_pos, length, 
 
 
 # should be called after the majority of the building is done
+# min_y_block is needed for how far the ladder should go down
+# returns min_render_distance, min_y_block
 def calculate_min_render_distance_needed(schem):
     schem_bounds = schem.getStructure().getBounds()
     # assuming player is at 0,0,0 (that's the middle of the contraption)
@@ -542,7 +546,7 @@ def calculate_min_render_distance_needed(schem):
     # redstone in the left white chunk is just barely loaded (tested with 1.17.1 Singleplayer)
     # so if there's a distance of 50 e.g. between me and my redstone, we'd recommend a render distance of
     # at least 3+2
-    return max_distance // 16 + 2
+    return max_distance // 16 + 2, schem_bounds[0][1]
 
 
 def build_contraption(schem, lines, left_width, middle_width, right_width, height, title, use_redstone_lamp):
@@ -614,18 +618,29 @@ def build_contraption(schem, lines, left_width, middle_width, right_width, heigh
     for line in lines:
         # finding out where each line needs to turn:
         turns = []
+        sum_of_blocks_in_turns = 0
         # 2 because it is needed before the first turn
         z_difference = current_z - begin_z + 2 + additional_spacing
         turns.append(2 + 2 * line.col)
+        sum_of_blocks_in_turns += 2 + 2 * line.col
         # these values are because of the horizontal adjustment, and to make space for the vertical connection and 1gt delay maker
         x_difference = 2 * width + 13
         turns.append(9 + 4 * line.col)
-        for i in range(15):#idk, should be long enough TODO
+        sum_of_blocks_in_turns += 9 + 4 * line.col
+        # rough upper guess for how many turns are enough, to make sure
+        # we calculate it as if the line has md2, and it has to play every 2 or 3 redstone ticks
+        # this means that it has to be as long, as many redstone tick delays it needs to delay
+        # because md2 delay 2 is 2 blocks long, and md2 delay 3 is 3 blocks long
+        # *2 +64 just to be safe, because while turning, there may be some blocks lost e.g. adding redstone dust as spacer
+        while sum_of_blocks_in_turns <= line.max_duration * 2 + 64:
             turns.append(z_difference + 4 * line.col)
+            sum_of_blocks_in_turns += z_difference + 4 * line.col
             z_difference += 2 * width
             turns.append(x_difference + 4 * line.col)
+            sum_of_blocks_in_turns += x_difference + 4 * line.col
             x_difference += 2 * width
         line.build_delays(turns)
 
-    min_render_dist = calculate_min_render_distance_needed(schem)
-    build_glass_walkway(schem, player_pos, Vector(0, 0, -1), bottom_connection_pos, walkway_length, 10, title, min_render_dist)# TODO 10 deep ladder
+    min_render_dist, min_y_block = calculate_min_render_distance_needed(schem)
+    ladder_length = -min_y_block
+    build_glass_walkway(schem, player_pos, Vector(0, 0, -1), bottom_connection_pos, walkway_length, ladder_length, title, min_render_dist)

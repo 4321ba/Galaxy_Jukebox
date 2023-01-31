@@ -87,7 +87,7 @@ if __name__ == '__main__':
     convert(argv[1], argv[2])
 
 # TODO-s:
-# todo-s in split_lines
+# fix edge case with e.g. 1 noteblock
 # /fill: fix the right side ending/last part to be symmetric with left side
 # go back to original mcschematic
 
