@@ -24,6 +24,7 @@ def get_title(song, filename):
 
 """
 song is either pynbs.File or string (= input path)
+use_redstone_lamp: whether or not to place redstone lamp next to the noteblock
 sides_mode is how many sides the noteblocks should have (-1, or between 1 and 3)
 -1: using one of the 3 based on noteblock count
 1: 2n wide, n high rectangle in front
@@ -47,7 +48,10 @@ def convert(song, out_path, use_redstone_lamp=True, sides_mode=-1):
     lines.sort(key=lambda l: l.note + 100 * l.instrument)
         
     count = len(lines)
-    assert count > 0, "There is no line to convert!"
+    assert count > 0, "There is no line to convert, I need notes!"
+    if count <= 0: # if assertions are excluded, we just silently exit
+        return
+    
     if sides_mode == -1:
         if count <= 128: # 16*8
             sides_mode = 1
@@ -60,6 +64,10 @@ def convert(song, out_path, use_redstone_lamp=True, sides_mode=-1):
     height = int(0.5 + ceil(sqrt( count / (2 * sides_mode) )))
     whole_width = int(0.5 + ceil(count / height))
     
+    # edge case if there's a single note block line (we do this so the redstone lamp doesn't collide with glass):
+    if whole_width == 1:
+        whole_width += 1
+
     schem = MCSchematic()
     
     if sides_mode == 1:
@@ -77,7 +85,7 @@ def convert(song, out_path, use_redstone_lamp=True, sides_mode=-1):
     
     build_contraption(schem, lines, left_width, middle_width, right_width, height, title, use_redstone_lamp)
     
-    if out_path[-6:] == ".schem": # library adds extension if not present
+    if out_path[-6:] == ".schem": # library adds extension even if present
         out_path = out_path[:-6]
     schem.save("", out_path, Version.JE_1_14)
 
@@ -87,7 +95,6 @@ if __name__ == '__main__':
     convert(argv[1], argv[2])
 
 # TODO-s:
-# fix edge case with e.g. 1 noteblock
 # /fill: fix the right side ending/last part to be symmetric with left side
 # go back to original mcschematic
 
