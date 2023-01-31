@@ -50,7 +50,7 @@ class SplitLine:
     def get_pos(self):
         return self._pos
     
-    def build_noteblock(self):
+    def build_noteblock(self, use_redstone_lamp):
 
         def conditional_patch_above_below(vec):
             # patching above the 2nd row so it has the same height as the neighbors
@@ -68,7 +68,9 @@ class SplitLine:
 
         v = self._pos
         up = Vector(0, 1, 0)
-        bld.setblock(self._schem, v - up, "redstone_lamp")
+        # tripwire is needed for sand/concrete powder, so that it doesn't fall off
+        if use_redstone_lamp or bld.instrument_name[self.instrument] == "snare":
+            bld.setblock(self._schem, v - up, "redstone_lamp" if use_redstone_lamp else "tripwire")
         bld.setblock(self._schem, v, bld.instrument_material[self.instrument])
         bld.setblock(self._schem, v + up, f"note_block[note={self.note},instrument={bld.instrument_name[self.instrument]}]")
         v += self._forward
@@ -543,7 +545,7 @@ def calculate_min_render_distance_needed(schem):
     return max_distance // 16 + 2
 
 
-def build_contraption(schem, lines, left_width, middle_width, right_width, height, title):
+def build_contraption(schem, lines, left_width, middle_width, right_width, height, title, use_redstone_lamp):
     width = left_width + middle_width + right_width
     assert 1 <= len(lines) <= width * height, f"There are {len(lines)} lines, but only {width * height} places for them!"
     view_distance = max(left_width, right_width, middle_width) # this is the space between player pos and middle side
@@ -588,7 +590,7 @@ def build_contraption(schem, lines, left_width, middle_width, right_width, heigh
     # but at the 2 ends they may place the repeater 1 block sooner, hence +2
     turn_max_delay = (2*2 * shallow_depth + 2) // 16 + 1 # +1 for the extra repeater at the end
     for line in lines:
-        line.build_noteblock()
+        line.build_noteblock(use_redstone_lamp)
         line.build_side_turn(turn_max_delay)
         line.build_vertical_adjustment()
         line.build_horizontal_adjustment()

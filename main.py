@@ -30,7 +30,7 @@ sides_mode is how many sides the noteblocks should have (-1, or between 1 and 3)
 2: 2n×n rectangle to the right and another in front
 3: 2n×n rectangles on all 3 sides
 """
-def convert(song, out_path, sides_mode=-1):
+def convert(song, out_path, use_redstone_lamp=True, sides_mode=-1):
     filename = ""
     if type(song) == str:
         filename = song
@@ -75,7 +75,7 @@ def convert(song, out_path, sides_mode=-1):
         middle_width = whole_width - 2 * left_width
         right_width = left_width
     
-    build_contraption(schem, lines, left_width, middle_width, right_width, height, title)
+    build_contraption(schem, lines, left_width, middle_width, right_width, height, title, use_redstone_lamp)
     
     if out_path[-6:] == ".schem": # library adds extension if not present
         out_path = out_path[:-6]
@@ -88,7 +88,6 @@ if __name__ == '__main__':
 
 # TODO-s:
 # todo-s in split_lines
-# bool redstonelamp or tripwire, to reduce lag bc of lighting updates
 # /fill: fix the right side ending/last part to be symmetric with left side
 # go back to original mcschematic
 
