@@ -51,6 +51,22 @@ class SplitLine:
     def get_pos(self):
         return self._pos
     
+    # this is the last note line, and it should place concrete to the right of the note blocks, so there are blocks there and it doesn't look ugly
+    def last_note_fill_remaining(self):
+
+        def fill(v1, v2):
+            for x in range(min(v1.x, v2.x), max(v1.x, v2.x) + 1):
+                for y in range(min(v1.y, v2.y), max(v1.y, v2.y) + 1):
+                    for z in range(min(v1.z, v2.z), max(v1.z, v2.z) + 1):
+                        bld.setblock(self._schem, Vector(x, y, z), self._buildblock)
+
+        left = self._forward.rotated()
+        up = Vector(0, 1, 0)
+        begin = self._pos + self._forward + left + up * (2 * (self.row + 1))
+        end = begin - left * 2 - up * (2 * (self._max_row + 1))
+        fill(begin, end)
+
+
     def build_noteblock(self, use_redstone_lamp):
 
         def conditional_patch_above_below(vec):
@@ -589,6 +605,8 @@ def build_contraption(schem, lines, left_width, middle_width, right_width, heigh
     index = begin_lines(right_side_upper_left_corner, left_width + middle_width, right_width, height, Vector(0, 0, -1), lines, index, "right")
     assert index == len(lines), f"Something went wrong with beginning the lines, index until built is {index} but the amount of lines is {len(lines)}"
     
+    lines[-1].last_note_fill_remaining()
+
     shallow_depth = max(left_width, right_width)
     # the 2*2 * shallow_depth is the max amount of blocks the signal needs to travel,
     # but at the 2 ends they may place the repeater 1 block sooner, hence +2

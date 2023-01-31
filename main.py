@@ -5,7 +5,8 @@ from pynbs import read
 from unsplit_lines import lines_from_song
 from split_lines import SplitLine, build_contraption
 from math import sqrt, ceil
-from mcschematic_safe import MCSchematic, Version # mcschematic_safe has a warning if we're replacing an already set block with setblock, helping us find bugs/obvious problems in our algorithm
+#from mcschematic_safe import MCSchematic, Version # mcschematic_safe has a warning if we're replacing an already set block with setblock, helping us find bugs/obvious problems in our algorithm
+from mcschematic import MCSchematic, Version
 
 # filename can be empty string
 def get_title(song, filename):
@@ -95,8 +96,6 @@ if __name__ == '__main__':
     convert(argv[1], argv[2])
 
 # TODO-s:
-# /fill: fix the right side ending/last part to be symmetric with left side
-# go back to original mcschematic
 
 # upload to pip, and gui 
 
