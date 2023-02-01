@@ -97,7 +97,16 @@ if __name__ == '__main__':
 
 # TODO-s:
 
+# gui: fix image, make image change on button modification
+
 # upload to pip, and gui 
 
+# make readme fancier, screenshot, etc
+
+# create standalone executable, and release
+
+# make video (+world)
+
+#adding these to readme:
 # maybe support for custom instruments (command block playsound and bool option for including it or not)
 # support for different volumes, panning (position of the noteblock, dummy splitline), and maybe pitch fine tuning (command block playsound)

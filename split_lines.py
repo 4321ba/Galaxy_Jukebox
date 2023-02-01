@@ -499,6 +499,7 @@ def build_glass_walkway(schem, player_pos, forward, one_gt_delayer_pos, length, 
     # 15 characters for sure fit onto one row of the sign
     title = title.replace("'", "")
     title = title.replace("\"", "")
+    title = title.replace("\\", "")
     title_1 = title[0:15]
     title_2 = title[15:30]
     title_3 = title[30:45]
