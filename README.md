@@ -1,6 +1,6 @@
 # Galaxy Jukebox
 
-Schematic exporter for Minecraft Noteblock Studio, making a galaxy-shaped jukebox that plays the song.
+Schematic exporter for Minecraft Note Block Studio, making a galaxy-shaped redstone jukebox, that plays the song.
 
 Works with old and new versions of the nbs format, and outputs version 2 of Sponge schematic (it works with WorldEdit e.g.).
 
