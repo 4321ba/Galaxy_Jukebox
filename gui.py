@@ -6,9 +6,11 @@
 
 from sys import argv
 from os.path import join, basename, splitext
+
 from PyQt5.QtCore import QCoreApplication, Qt
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QApplication, QPushButton, QFileDialog, QGridLayout, QLabel, QWidget, QComboBox, QCheckBox
+# upgrading to pyqt6 should be as easy as replacing 5 with 6
 
 from main import convert
 
@@ -142,7 +144,7 @@ convert_button.pressed.connect(convert_files)
 # creating right side
 right_label = QLabel()
 layout.addWidget(right_label, 0, 1, 7, 1)
-layout.setAlignment(right_label, Qt.AlignTop)
+layout.setAlignment(right_label, Qt.AlignmentFlag.AlignTop)
 set_label_texts()
 
 window.show()
