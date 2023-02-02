@@ -8,7 +8,7 @@ from sys import argv
 from os.path import join, basename, splitext
 from PyQt5.QtCore import QCoreApplication, Qt
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtWidgets import QApplication, QPushButton, QFileDialog, QGridLayout, QLabel, QWidget, QComboBox, QCheckBox, QSizePolicy
+from PyQt5.QtWidgets import QApplication, QPushButton, QFileDialog, QGridLayout, QLabel, QWidget, QComboBox, QCheckBox
 
 from main import convert
 
@@ -30,7 +30,6 @@ def update_screenshot():
     # https://www.pythonguis.com/faq/adding-images-to-pyqt5-applications/
     pixmap = QPixmap(f"gui_icons/{side_combobox.currentIndex()}side_{'' if lamp_checkbox.isChecked() else 'no'}lamp.png")
     screenshot.setPixmap(pixmap)
-    print("hee")#TODO
     
 def get_input_files():
     global input_files 
@@ -116,6 +115,7 @@ output_button.pressed.connect(get_output_files)
 lamp_checkbox = QCheckBox("Place redstone lamp")
 layout.addWidget(lamp_checkbox, 3, 0)
 lamp_checkbox.setChecked(True)
+lamp_checkbox.stateChanged.connect(update_screenshot)
 
 side_combobox = QComboBox()
 layout.addWidget(side_combobox, 4, 0)
@@ -123,13 +123,15 @@ side_combobox.addItem("Sides: Automatic")
 side_combobox.addItem("Sides: 1")
 side_combobox.addItem("Sides: 2")
 side_combobox.addItem("Sides: 3")
+side_combobox.currentIndexChanged.connect(update_screenshot)
 
 screenshot = QLabel()
 layout.addWidget(screenshot, 5, 0)
-screenshot.setMinimumHeight(90)
-screenshot.setMinimumWidth(160)
+screenshot.setMinimumHeight(180)
+screenshot.setMinimumWidth(320)
+screenshot.setMaximumHeight(180)
+screenshot.setMaximumWidth(320)
 screenshot.setScaledContents(True)
-screenshot.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Policy.Ignored)
 update_screenshot()
 
 convert_button = QPushButton("Convert")

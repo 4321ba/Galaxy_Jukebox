@@ -97,8 +97,6 @@ if __name__ == '__main__':
 
 # TODO-s:
 
-# gui: fix image, make image change on button modification
-
 # upload to pip, and gui 
 
 # make readme fancier, screenshot, etc
