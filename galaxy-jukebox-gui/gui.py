@@ -10,9 +10,9 @@ from os.path import join, basename, splitext
 from PyQt5.QtCore import QCoreApplication, Qt
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QApplication, QPushButton, QFileDialog, QGridLayout, QLabel, QWidget, QComboBox, QCheckBox
-# upgrading to pyqt6 should be as easy as replacing 5 with 6
+# upgrading to pyqt6 should be as easy as replacing 5 with 6 here
 
-from galaxy-jukebox import convert
+from galaxy_jukebox import convert
 
 def set_label_texts(bottom_text = ""):
     text = f"{len(input_files)} input files are chosen.\n"

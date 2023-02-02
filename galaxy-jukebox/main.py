@@ -2,10 +2,12 @@
 
 from os.path import basename
 from pynbs import read
-from unsplit_lines import lines_from_song
-from split_lines import SplitLine, build_contraption
+from .unsplit_lines import lines_from_song
+from .split_lines import SplitLine, build_contraption
 from math import sqrt, ceil
+
 #from mcschematic_safe import MCSchematic, Version # mcschematic_safe has a warning if we're replacing an already set block with setblock, helping us find bugs/obvious problems in our algorithm
+# https://github.com/4321ba/Galaxy_Jukebox/blob/ee404ddf33f0d11f4d2c8b10caf065a8ac8374fd/mcschematic_safe.py
 from mcschematic import MCSchematic, Version
 
 # filename can be empty string

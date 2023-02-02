@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from vector import Vector
+from .vector import Vector
 
 instrument_name = [
     "harp",

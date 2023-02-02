@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
-from vector import Vector
-import builder as bld
+from .vector import Vector
+from . import builder as bld
 
 # represents a redstone wire line corresponding to a single instrument/pitch noteblock
 # it is split enough to be actually created with redstone, and has the methods to do so

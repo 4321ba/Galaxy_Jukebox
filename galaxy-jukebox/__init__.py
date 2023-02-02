@@ -1,3 +1,3 @@
 #!/usr/bin/env python3
 
-from main import convert
+from .main import convert
