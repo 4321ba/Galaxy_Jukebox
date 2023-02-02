@@ -6,6 +6,7 @@
 
 from sys import argv
 from os.path import join, basename, splitext
+from pkgutil import get_data
 
 from PyQt5.QtCore import QCoreApplication, Qt
 from PyQt5.QtGui import QPixmap
@@ -29,8 +30,12 @@ def set_label_texts(bottom_text = ""):
     right_label.setText(text)
 
 def update_screenshot():
-    # https://www.pythonguis.com/faq/adding-images-to-pyqt5-applications/
-    pixmap = QPixmap(f"gui_icons/{side_combobox.currentIndex()}side_{'' if lamp_checkbox.isChecked() else 'no'}lamp.png")
+    path = f"gui_icons/{side_combobox.currentIndex()}side_{'' if lamp_checkbox.isChecked() else 'no'}lamp.png"
+    # https://stackoverflow.com/a/58941536 because qt resource system seemed complicated
+    data = get_data(__name__, path)
+    # https://forum.qt.io/topic/64768/solved-how-to-show-image-from-byte-array/2
+    pixmap = QPixmap()
+    pixmap.loadFromData(data, "png")
     screenshot.setPixmap(pixmap)
     
 def get_input_files():
