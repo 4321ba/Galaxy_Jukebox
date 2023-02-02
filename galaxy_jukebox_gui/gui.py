@@ -14,6 +14,7 @@ from PyQt5.QtWidgets import QApplication, QPushButton, QFileDialog, QGridLayout,
 # upgrading to pyqt6 should be as easy as replacing 5 with 6 here
 
 from galaxy_jukebox import convert
+from . import __version__
 
 def set_label_texts(bottom_text = ""):
     text = f"{len(input_files)} input files are chosen.\n"
@@ -104,7 +105,7 @@ app = QApplication(argv)
 
 # creating window
 window = QWidget()
-window.setWindowTitle("Galaxy Jukebox GUI")
+window.setWindowTitle(f"Galaxy Jukebox GUI {__version__}")
 layout = QGridLayout()
 window.setLayout(layout)
 
