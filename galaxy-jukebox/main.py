@@ -89,22 +89,3 @@ def convert(song, out_path, use_redstone_lamp=True, sides_mode=-1):
     if out_path[-6:] == ".schem": # library adds extension even if present
         out_path = out_path[:-6]
     schem.save("", out_path, Version.JE_1_14)
-
-
-if __name__ == '__main__':
-    from sys import argv
-    convert(argv[1], argv[2])
-
-# TODO-s:
-
-# upload to pip, and gui 
-
-# make readme fancier, screenshot, etc
-
-# create standalone executable, and release
-
-# make video (+world)
-
-#adding these to readme:
-# maybe support for custom instruments (command block playsound and bool option for including it or not)
-# support for different volumes, panning (position of the noteblock, dummy splitline), and maybe pitch fine tuning (command block playsound)
