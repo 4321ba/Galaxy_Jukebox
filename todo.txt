@@ -4,8 +4,18 @@
 # upload to pip, and gui 
 
 # make readme fancier, screenshot, etc
+to readme:
+install through pip
+gui screenshot
+minecraft screenshot
+how to run as cmdline program (own command vs python3 -m)
+how to run from a python script (for the converter)
+maybe a small tutorial for the gui as well / explaining the screenshot
+link back and forth (cli/gui), and for pypi as well (no duplication between readmes! for more info, read the other readme)
+
 
 # create standalone executable, and release
+for windows and maybe for linux
 
 # make video (+world)
 
