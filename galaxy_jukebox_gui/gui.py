@@ -72,8 +72,11 @@ def main():
             set_label_texts("Converting\n" + input + "\ninto\n" + output)
             # https://pythonassets.com/posts/background-tasks-with-pyqt/
             QCoreApplication.processEvents() # so that the text is updated
-            convert(input, output, place_redstone_lamp, sides_mode)
-            set_label_texts("Conversion done!")
+            try:
+                convert(input, output, place_redstone_lamp, sides_mode)
+                set_label_texts("Conversion done!")
+            except Exception as e:
+                set_label_texts("Conversion failed! Reason:\n" + str(e))
 
         if input_files == []:
             set_label_texts("No input provided!")
