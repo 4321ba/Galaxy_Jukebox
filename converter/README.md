@@ -91,7 +91,7 @@ Be sure to tell me if something ain't right, e.g. by opening an [issue](https://
 
 ## How it works
 
-If you're interested in how it works, you can read the documentation [locally](documentation.md) (or on [GitHub](https://github.com/4321ba/Galaxy_Jukebox/blob/main/galaxy_jukebox/documentation.md)), where I try to describe the ideas behind the conversion.
+If you're interested in how it works, you can read the documentation [locally](documentation.md) (or on [GitHub](https://github.com/4321ba/Galaxy_Jukebox/blob/main/converter/documentation.md)), where I try to describe the ideas behind the conversion.
 
 ## Minecraft version
 
