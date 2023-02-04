@@ -11,7 +11,7 @@ from pkgutil import get_data
 from PyQt5.QtCore import QCoreApplication, Qt
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QApplication, QPushButton, QFileDialog, QGridLayout, QLabel, QWidget, QComboBox, QCheckBox
-# upgrading to pyqt6 should be as easy as replacing 5 with 6 here
+# upgrading to pyqt6 should be as easy as replacing 5 with 6 here, in the imports
 
 from galaxy_jukebox import convert
 from . import __version__

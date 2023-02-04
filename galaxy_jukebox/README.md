@@ -4,47 +4,72 @@ Schematic exporter for Minecraft Note Block Studio, making a galaxy-shaped redst
 
 Works with old and new versions of the nbs format, and outputs version 2 of Sponge schematic (it works with WorldEdit e.g.).
 
-README OUTDATED
+See [Galaxy Jukebox GUI](https://pypi.org/project/galaxy-jukebox-gui/) for the graphical interface.
+
+## Installation
+
+The project is available on [PyPI](https://pypi.org/project/galaxy-jukebox/), so you can install it via pip, if you have Python3 installed:
+
+```sh
+pip3 install galaxy-jukebox
+```
 
 ## Usage
 
-### Installing dependencies
+### From command line
 
-You'll need to install Python3. (Don't forget to add it to path!)
-
-This program also requires `nbtlib` and `mcschematic` to be installed:
+You can convert a single file with:
 
 ```sh
-pip3 install nbtlib mcschematic
+python3 -m galaxy_jukebox input.nbs output.schem
 ```
 
-### Batch converting
-
-There is a quick little script included for converting one or more files: you can paste the `.nbs` files inside the root folder (`Galaxy_Jukebox` or `Galaxy_Jukebox-main` probably), and double click `batch_convert.py` there.
-
-If everything is setup correctly, soon you should see the output files in the same directory (it takes a couple of seconds for the conversion).
-
-If it doesn't work, you'll probably see nothing, in that case you should try it through the command line to see the error:
+or by using the dedicated command:
 
 ```sh
-python3 batch_convert.py
+galaxy_jukebox input.nbs output.schem
 ```
 
-### Converting one file from command line
+### From script
 
-If you want to specify the input and output file, you should be able to use this command (the paths are relative to where you opened the terminal):
+I'll show you how to use it with an example: this script batch converts all the nbs files from the current directory:
 
-```sh
-python3 main.py input.nbs output.schem
+```py
+#!/usr/bin/env python3
+
+from galaxy_jukebox import convert
+from os import listdir
+
+for filename in listdir():
+    if filename[-4:] == ".nbs":
+        convert(filename, filename[:-4] + ".schem")
 ```
+This is the header for the convert function:
+
+```py
+convert(song, out_path, use_redstone_lamp=True, sides_mode=-1)
+```
+
+Song is either pynbs.File, or a string (input path).
+
+Output path is string.
+
+Use redstone lamp: whether or not to place redstone lamp next to the note block (it looks cooler with lamp, but playback performance may be compromised).
+
+Sides mode is how many sides the noteblocks should have (-1, or between 1 and 3):
+
+- -1 (automatic): using one of the following 3 based on noteblock count
+- 1: 2n wide, n high rectangle in front
+- 2: 2n×n rectangle to the right, and another in front
+- 3: 2n×n rectangles on all 3 sides
+
+## Feedback
 
 Be sure to tell me if something ain't right, e.g. by opening an [issue](https://github.com/4321ba/Galaxy_Jukebox/issues)!
 
-## Current state
+## How it works
 
-The program is quite complete, but there are some some more things I may want to do.
-
-If you're interested in how it works, you can read [the documentation](documentation.md)!
+If you're interested in how it works, you can read the documentation [locally](documentation.md) (or on [GitHub](https://github.com/4321ba/Galaxy_Jukebox/blob/main/galaxy_jukebox/documentation.md)), where I try to describe the ideas behind the conversion.
 
 ## Minecraft version
 
@@ -53,7 +78,7 @@ The program currently needs 1.14 for:
 - scaffolding (for the 1gt delay, there are [other designs too](https://www.youtube.com/watch?v=O0xOAOM_R0Y), but this seems the best)
 - smooth granite/andesite slab (aesthetics)
 - birch sign (because we need 1.14, the sign has to have a woodtype)
-- all the noteblock sounds (there isn't any check present whether they are available)
+- all the noteblock sounds (there isn't any check present, whether they are available)
 - 1.13 is maybe needed for the .schem support (and blockstates) in WorldEdit/etc., idk
 - 1.13 for jungle wood
 
@@ -67,7 +92,7 @@ It is fine in my opinion, it takes 12 seconds to convert the 10 minute version o
 - [MCSchematic](https://github.com/Sloimayyy/mcschematic), for creating the output schematic file
 - [Lithium](https://www.curseforge.com/minecraft/mc-mods/lithium), [Sodium](https://www.curseforge.com/minecraft/mc-mods/sodium) and [Phosphor](https://www.curseforge.com/minecraft/mc-mods/phosphor) for optimizing the game enough for it to be able to play more complex pieces
 
-## Related
+## Related links
 
 - [Open Noteblock Studio issue](https://github.com/OpenNBS/OpenNoteBlockStudio/issues/310)
 - [ONBS schematic export rework project](https://github.com/OpenNBS/OpenNoteBlockStudio/projects/1)

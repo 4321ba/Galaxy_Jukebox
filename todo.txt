@@ -1,6 +1,8 @@
 
 # TODO-s:
 
+gui signal if something failed! instead of done
+
 # upload to pip, and gui 
 
 # make readme fancier, screenshot, etc
