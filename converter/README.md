@@ -2,13 +2,18 @@
 
 Schematic exporter for Minecraft Note Block Studio, making a galaxy-shaped redstone jukebox, that plays the song.
 
-Works with old and new versions of the nbs format, and outputs version 2 of Sponge schematic (it works with WorldEdit e.g.).
+Works with old and new versions of the NBS format, and outputs Sponge schematic (WorldEdit can load it, for example).
 
 See [Galaxy Jukebox GUI](https://pypi.org/project/galaxy-jukebox-gui/) for the graphical interface.
 
-![Screenshot from above](screenshots/screenshot_1.png)
-![Screenshot still from above, but from a bit lower](screenshots/screenshot_2.png)
-![Screenshot from the front](screenshots/screenshot_3.png)
+The project is available on [PyPI](https://pypi.org/project/galaxy-jukebox/).
+
+<!---Github absolute link, so it works on PyPI at least--->
+![See the PyPI page for the screenshots!](https://raw.githubusercontent.com/4321ba/Galaxy_Jukebox/main/converter/screenshots/screenshot_1.png)
+
+![screenshot from above](https://raw.githubusercontent.com/4321ba/Galaxy_Jukebox/main/converter/screenshots/screenshot_2.png)
+
+![screenshot from the front](https://raw.githubusercontent.com/4321ba/Galaxy_Jukebox/main/converter/screenshots/screenshot_3.png)
 
 ## Comparison with the traditional walking design
 
@@ -29,7 +34,7 @@ See [Galaxy Jukebox GUI](https://pypi.org/project/galaxy-jukebox-gui/) for the g
 
 ## Installation
 
-The project is available on [PyPI](https://pypi.org/project/galaxy-jukebox/), so you can install it via pip, if you have Python3 installed:
+You can install the project via pip, if you have Python3 installed:
 
 ```sh
 pip3 install galaxy-jukebox

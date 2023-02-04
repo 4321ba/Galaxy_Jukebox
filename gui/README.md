@@ -20,7 +20,8 @@ If you downloaded the pip version, you can launch it by entering the command `py
 
 You should see something similar to this (theming may be different):
 
-![Screenshot of the program](gui_screenshot.png)
+<!---Github absolute link, so it works on PyPI at least--->
+![See the PyPI page for the screenshot!](https://raw.githubusercontent.com/4321ba/Galaxy_Jukebox/main/gui/gui_screenshot.png)
 
 (It's qt, isn't it :D?)
 
