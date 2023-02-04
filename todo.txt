@@ -6,4 +6,6 @@
 # create standalone executable, and release
 for windows and maybe for linux
 
+proofread all the readmes to check if everything works
+
 # make video (+world dl)

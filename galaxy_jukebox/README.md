@@ -10,6 +10,23 @@ See [Galaxy Jukebox GUI](https://pypi.org/project/galaxy-jukebox-gui/) for the g
 ![Screenshot still from above, but from a bit lower](screenshots/screenshot_2.png)
 ![Screenshot from the front](screenshots/screenshot_3.png)
 
+## Comparison with the traditional walking design
+
+### Advantages of this design
+
++ you don't need to move
++ supports 20 tps, and every other tps (with the scaffolding thing)
++ you can actually see the noteblocks that play (and there are also optional redstone lamps)
++ looks like a colorful galaxy, pretty cool
++ sand doesn't fall (neither does concrete powder)
+
+### Drawbacks
+
+- pretty huge compared to the walking design
+- quite slow, sodium+lithium or a fast PC is strongly recommended for medium-to-large pieces
+- you need quite high render distances, so that all the redstone is loaded
+- most probably it doesn't work properly for pocket edition, though not tested
+
 ## Installation
 
 The project is available on [PyPI](https://pypi.org/project/galaxy-jukebox/), so you can install it via pip, if you have Python3 installed:
@@ -31,7 +48,7 @@ python3 -m galaxy_jukebox input.nbs output.schem
 or by using the dedicated command:
 
 ```sh
-galaxy_jukebox input.nbs output.schem
+galaxy-jukebox input.nbs output.schem
 ```
 
 ### From script
@@ -87,7 +104,7 @@ The program needs 1.14 for:
 - 1.13 is probably needed for the .schem support (and blockstates), when pasting the schematic
 - 1.13 for jungle wood (root)
 
-## Performance
+## Conversion performance
 
 It is fine in my opinion, it takes 12 seconds to convert the 10 minute version of Genesis of the End on my machine (not a beast).
 
