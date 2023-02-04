@@ -1,26 +1,9 @@
 
 # TODO-s:
 
-gui signal if something failed! instead of done
-
-# upload to pip, and gui 
-
-# make readme fancier, screenshot, etc
-to readme:
-install through pip
-gui screenshot
-minecraft screenshot
-how to run as cmdline program (own command vs python3 -m)
-how to run from a python script (for the converter)
-maybe a small tutorial for the gui as well / explaining the screenshot
-link back and forth (cli/gui), and for pypi as well (no duplication between readmes! for more info, read the other readme)
-
+# upload to pip
 
 # create standalone executable, and release
 for windows and maybe for linux
 
-# make video (+world)
-
-#adding these to readme:
-# maybe support for custom instruments (command block playsound and bool option for including it or not)
-# support for different volumes, panning (position of the noteblock, dummy splitline), and maybe pitch fine tuning (command block playsound)
+# make video (+world dl)

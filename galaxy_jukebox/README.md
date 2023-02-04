@@ -6,6 +6,10 @@ Works with old and new versions of the nbs format, and outputs version 2 of Spon
 
 See [Galaxy Jukebox GUI](https://pypi.org/project/galaxy-jukebox-gui/) for the graphical interface.
 
+![Screenshot from above](screenshots/screenshot_1.png)
+![Screenshot still from above, but from a bit lower](screenshots/screenshot_2.png)
+![Screenshot from the front](screenshots/screenshot_3.png)
+
 ## Installation
 
 The project is available on [PyPI](https://pypi.org/project/galaxy-jukebox/), so you can install it via pip, if you have Python3 installed:
@@ -44,6 +48,7 @@ for filename in listdir():
     if filename[-4:] == ".nbs":
         convert(filename, filename[:-4] + ".schem")
 ```
+
 This is the header for the convert function:
 
 ```py
@@ -73,18 +78,24 @@ If you're interested in how it works, you can read the documentation [locally](d
 
 ## Minecraft version
 
-The program currently needs 1.14 for:
+The program needs 1.14 for:
 
 - scaffolding (for the 1gt delay, there are [other designs too](https://www.youtube.com/watch?v=O0xOAOM_R0Y), but this seems the best)
 - smooth granite/andesite slab (aesthetics)
 - birch sign (because we need 1.14, the sign has to have a woodtype)
-- all the noteblock sounds (there isn't any check present, whether they are available)
-- 1.13 is maybe needed for the .schem support (and blockstates) in WorldEdit/etc., idk
-- 1.13 for jungle wood
+- all 16 noteblock sounds (there isn't any check present, whether they are available)
+- 1.13 is probably needed for the .schem support (and blockstates), when pasting the schematic
+- 1.13 for jungle wood (root)
 
 ## Performance
 
 It is fine in my opinion, it takes 12 seconds to convert the 10 minute version of Genesis of the End on my machine (not a beast).
+
+## Improvements that could be made
+
+We could use the volume and panning information, to place the note block at just the right position, so that the volume and panning sounds like it should. Then there would be holes in the wall of note blocks. The work required is first to split the lines/note blocks further (same pitch, different volume needs a different note block this way), and also store the additional information in the note lines. The hardest part would be the algorithm for calculating the best position, taking all the other note lines into account as well (so the note blocks are overall as close to their preferred position, as they can be).
+
+Another idea would be to use command blocks with `/playsound` instead of note blocks where it makes sense: then we could support custom instruments, and pitch fine tuning (cents).
 
 ## Huge thanks to these projects!
 - [OpenNBS](https://github.com/OpenNBS/OpenNoteBlockStudio), the program for creating note block music
