@@ -56,6 +56,12 @@ or by using the dedicated command:
 galaxy-jukebox input.nbs output.schem
 ```
 
+The 2 conversion options (redstone lamp (bool), and side count / sides mode (-1, 1, 2 or 3)) described later, can also be used here:
+
+```sh
+galaxy-jukebox input.nbs output.schem False 2
+```
+
 ### From script
 
 I'll show you how to use it with an example: this script batch converts all the nbs files from the current directory:
