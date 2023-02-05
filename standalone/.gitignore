@@ -1,0 +1,5 @@
+standalone.build
+standalone.dist
+standalone.onefile-build
+virt_env
+galaxy-jukebox-gui.bin
