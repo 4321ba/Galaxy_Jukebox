@@ -3,3 +3,4 @@ standalone.dist
 standalone.onefile-build
 virt_env
 galaxy-jukebox-gui.bin
+galaxy-jukebox-gui.exe
