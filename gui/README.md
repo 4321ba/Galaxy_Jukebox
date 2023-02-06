@@ -12,7 +12,7 @@ The project is available on [PyPI](https://pypi.org/project/galaxy-jukebox-gui/)
 pip3 install galaxy-jukebox-gui
 ```
 
-Alternatively, (hopefully) you will be able to download an executable from [GitHub Releases](https://github.com/4321ba/Galaxy_Jukebox/releases), if you don't have Python.
+Alternatively, you can download a single executable from [GitHub Releases](https://github.com/4321ba/Galaxy_Jukebox/releases), if you don't have Python.
 
 ## Usage
 
@@ -25,7 +25,7 @@ You should see something similar to this (theming may be different):
 
 (It's qt, isn't it :D?)
 
-You can choose a single, or multiple input files, and an output file (if you chose a single input file) or an output path (if you chose multiple input files). The chosen files/path will be printed on the right. The 2 options available are the same as for the command line program (and choosing different options should change the image):
+You can choose a single, or multiple input files, and an output file (if you chose a single input file) or an output path (if you chose multiple input files). The output file may have the .nbs extension, you can safely ignore/delete that, the correct extension (.schem) will be added. The chosen files/path will be printed on the right. The 2 options available are the same as for the command line program (and choosing different options should change the image):
 
 Use redstone lamp: whether or not to place redstone lamp next to the note block (it looks cooler with lamp, but playback performance may be compromised).
 
