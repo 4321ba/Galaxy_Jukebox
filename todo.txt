@@ -2,6 +2,11 @@ create standalone executable, and release for windows and maybe for linux
 
 proofread all the readmes and check if everything works
 
-make video (+world dl)
+make video (+swingy thing as well!) (+world dl), link from here
 
 update onbs issue
+
+
+could be done:
+in gui when choosing out path, remove the .nbs extension as it is confusing
+make gui depend on lower version of pyqt (5.10/5.14 instead of 5.15, idk)

@@ -1,4 +1,7 @@
 #!/bin/bash
+
+# probably wiser to paste the lines one by one
+
 rm -r standalone.build
 rm -r standalone.dist
 rm -r standalone.onefile-build

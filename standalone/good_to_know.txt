@@ -1,0 +1,21 @@
+So I compiled the 1.0.0 version binaries using Python 3.8.10, which still works for Windows 7 and Ubuntu 20.04 (idk if they'd work above 3.8), I also needed to compile with ubuntu 20.04 (and not 22.04), so that the created elf file doesn't depend on too new glibc (objdump -T galaxy-jukebox-gui.bin)
+python 3.8 was the last version for win7, so my guess is that above that it wouldn't work the compiled version either
+
+However mcschematic officially only supports python3.9 and above, so you'll need to modify standalone/virt_env/lib/python3.8/site-packages/mcschematic/mcschematic.py, and add this to the very first line: "from __future__ import annotations", then it works with python3.8 as well
+
+also, installing pyqt5 may hang, because older pip versions can't accept the license, so make sure pip is >=21.1.1 (that works for sure)
+
+nuitka complains about the pyqt5 compilation being buggy, so if there's some problem with the interface, that may be it, but I didn't notice anything bad so I guess it should be ok
+
+for the windows compilation, I used wine, specifically Bottles:
+steps:
+create a new application bottle
+change win version to win 7
+install python3.8.10 (https://www.python.org/downloads/release/python-3810/) (add it to path!)
+git clone https://github.com/4321ba/Galaxy_Jukebox somewhere where the bottle finds it
+launch cmd.exe with bottles and cd into the standalone dir
+give the commands out one by one that are in the bat file
+nuitka will download dependencies automatically, let that happen, however, depends.exe will miss mfc42.dll (and the 64 bit version! so installing vcredist6 or vcredist6sp6 is not enough!) I solved this by downloading one from here:
+https://www.dll-files.com/mfc42.dll.html
+the one with the md5 sum of 3c7e6036a7edf123fb4f0ff7ccd9d6a6 worked for me, and virustotal.com said it is the original from microsoft, so it should definitely be ok
+I placed it next to depends.exe, so it can find it (AppData/Local/Nuitka/Nuitka/Cache/downloads/depends/x86_64/mfc42.dll)
