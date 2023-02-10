@@ -14,6 +14,7 @@ classifiers = [
 ]
 dynamic = ["version", "description"]
 dependencies = [
+# we shouldn't need 5.15, any older version will most probably work just as well (idk how old though)
     "PyQt5 >=5.15.0",
     "galaxy-jukebox >=1.0.0",
 ]

@@ -4,6 +4,8 @@ Schematic exporter for Minecraft Note Block Studio, making a galaxy-shaped redst
 
 Works with old and new versions of the NBS format, and outputs Sponge schematic (WorldEdit can load it, for example).
 
+There is a [short](https://youtu.be/0WIBQ5r_ZIY) and a [long](https://youtu.be/aBEKyepoqDM) YouTube video showing it in action.
+
 See [Galaxy Jukebox GUI](https://pypi.org/project/galaxy-jukebox-gui/) for the graphical interface.
 
 The project is available on [PyPI](https://pypi.org/project/galaxy-jukebox/).
